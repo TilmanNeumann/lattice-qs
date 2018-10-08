@@ -24,12 +24,12 @@ There is no documentation and no support, so you should be ready to start explor
 
 ## Authors
 
-* Tilman Neumann
+Tilman Neumann
 
 
 ## License
 
-This project is licensed under the GPL 3 License - see the [License.txt](License.txt) file for details
+This project is licensed under the GPL 3 License - see the [LICENSE](LICENSE) file for details
 
 
 ## Credits
