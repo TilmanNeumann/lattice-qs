@@ -2,10 +2,11 @@
 
 A study of a "lattice quadratic sieve" proposed by R.D.Silverman in https://www.mersenneforum.org/showthread.php?t=14080.
 
-The algorithm is not competitive with SIQS, rather comparable to a good CFrac implementation.
+The algorithm is not competitive with SIQS, rather comparable to a good CFrac implementation. The biggest number I factored yet
+using it had 220 bit, and that took around 40 minutes.
 
 Nonetheless, eventually the implementation of the lattice sieve might be interesting to some people.
-But beware: I wrote it without having seen Pollard's "The lattice sieve" paper, so it may look quite different than usual approaches. My best source of information was [Franke, Kleinjung 2005: CONTINUED FRACTIONS AND LATTICE SIEVING].
+But beware: I wrote it without having seen Pollard's "The lattice sieve" paper, so it may look quite different (and probably worse) than usual approaches. My best source of information was [Franke, Kleinjung 2005: CONTINUED FRACTIONS AND LATTICE SIEVING].
 
 ## Releases
 
