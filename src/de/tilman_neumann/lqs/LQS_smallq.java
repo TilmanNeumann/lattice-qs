@@ -143,7 +143,7 @@ public class LQS_smallq extends FactorAlgorithmBase {
 		if (k>1) {
 			BigInteger kBig = BigInteger.valueOf(k);
 			// avoid square kN without square N; that would lead to an infinite loop in trial division
-			if (N.mod(kBig).equals(ZERO)) {
+			if (N.mod(kBig).equals(I_0)) {
 				LOG.info("k = " + k + " divides N -> Found factor.");
 				return kBig;
 			}
@@ -306,7 +306,7 @@ public class LQS_smallq extends FactorAlgorithmBase {
 				LOG.info(getName() + ":");
 				LOG.info("Found factor " + factor + " (" + factor.bitLength() + " bits) of N=" + N + " (" + NBits + " bits) in " + TimeUtil.timeStr(timer.totalRuntime()));
 				int pMaxBits = 32 - Integer.numberOfLeadingZeros(pMax);
-				LOG.info("    multiplier k = " + k + ", kN%8 = " + kN.mod(EIGHT) + ", primeBaseSize = " + primeBaseSize + ", pMax = " + pMax + " (" + pMaxBits + " bits), sieveArrayArea = " + sieveArrayArea);
+				LOG.info("    multiplier k = " + k + ", kN%8 = " + kN.mod(I_8) + ", primeBaseSize = " + primeBaseSize + ", pMax = " + pMax + " (" + pMaxBits + " bits), sieveArrayArea = " + sieveArrayArea);
 				LOG.info("    tDiv: " + tdivReport.getOperationDetails());
 				LOG.info("    cc: " + ccReport.getOperationDetails());
 				if (CongruenceCollector.ANALYZE_BIG_FACTOR_SIZES) {

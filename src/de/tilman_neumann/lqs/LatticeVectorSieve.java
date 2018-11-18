@@ -13,7 +13,7 @@
  */
 package de.tilman_neumann.lqs;
 
-import static de.tilman_neumann.jml.base.BigIntConstants.ZERO;
+import static de.tilman_neumann.jml.base.BigIntConstants.I_0;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -118,9 +118,9 @@ public class LatticeVectorSieve implements LatticeSieve {
 			// The roots must satisfy Q(root, 1) == 0 (mod q)
 			BigInteger qBig = BigInteger.valueOf(q);
 			BigInteger Q1 = Qxy.evaluate(qRoots[0], 1);
-			assertTrue(Q1.mod(qBig).equals(ZERO));
+			assertTrue(Q1.mod(qBig).equals(I_0));
 			BigInteger Q2 = Qxy.evaluate(qRoots[1], 1);
-			assertTrue(Q2.mod(qBig).equals(ZERO));
+			assertTrue(Q2.mod(qBig).equals(I_0));
 		}
 		
 		// Silverman: "Find reduced lattices for [q r1][0 1] and [q r2][0 1]. This yields two sets of vectors V1, V2 and W1, W2."
@@ -436,7 +436,7 @@ public class LatticeVectorSieve implements LatticeSieve {
 							int y = e*qBase.b11 + f*qBase.b21;
 							BigInteger Q = Qxy.evaluate(x, y);
 							BigInteger pBig = BigInteger.valueOf(p);
-							assertTrue(Q.mod(pBig).equals(ZERO)); // works for exactly orthogonal sublattice case, too
+							assertTrue(Q.mod(pBig).equals(I_0)); // works for exactly orthogonal sublattice case, too
 
 							if (TEST_FACTORS) {
 								// verify that all small factors of Q are in the prime base
@@ -511,7 +511,7 @@ public class LatticeVectorSieve implements LatticeSieve {
 					assertTrue(x!=0 || y!=0);
 					BigInteger Q = Qxy.evaluate(x, y);
 					BigInteger qBig = BigInteger.valueOf(q);
-					assertTrue(Q.mod(qBig).equals(ZERO));
+					assertTrue(Q.mod(qBig).equals(I_0));
 					if (TEST_SIEVE_ARRAY) {
 						// test if the rest is smooth
 						BigInteger QRest = Q.divide(qBig);

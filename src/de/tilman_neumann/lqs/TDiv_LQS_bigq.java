@@ -162,7 +162,7 @@ public class TDiv_LQS_bigq implements TDiv_LQS {
 					assertEquals(A.multiply(A).mod(kN), Q.mod(kN));
 					// make sure that the product of factors gives Q
 					SortedMultiset<Integer> allQFactors = aqPair.getAllQFactors();
-					BigInteger testProduct = ONE;
+					BigInteger testProduct = I_1;
 					for (Map.Entry<Integer, Integer> entry : allQFactors.entrySet()) {
 						BigInteger prime = BigInteger.valueOf(entry.getKey());
 						int exponent = entry.getValue();

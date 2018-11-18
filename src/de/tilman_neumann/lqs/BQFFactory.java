@@ -91,7 +91,7 @@ public class BQFFactory {
 			g = bpsw.nextProbablePrime(g);
 			
 			// it is not required to choose g == 3 (mod 4) but very good for performance
-			if (g.and(THREE).intValue()!=3) {
+			if (g.and(I_3).intValue()!=3) {
 				if (DEBUG) LOG.debug("g = " + g + " != 3 (mod 4) -> skip");
 				continue;
 			}
@@ -111,7 +111,7 @@ public class BQFFactory {
 				// g divides kN -> Since g is typically much bigger than k, this means we found a factor of N! -> test gcd
 				if (DEBUG) LOG.debug("g = " + g + " divides kN -> a factor of N?");
 				BigInteger gcd = N.gcd(g);
-				if (gcd.compareTo(ONE)>0 && gcd.compareTo(N)<0) throw new FactorException(gcd);
+				if (gcd.compareTo(I_1)>0 && gcd.compareTo(N)<0) throw new FactorException(gcd);
 			} else {
 				if (DEBUG) LOG.debug("kN = " + k + " * " + N + " is not a quadratic residue (mod g), g = " + g + " -> skip");
 			}
@@ -130,7 +130,7 @@ public class BQFFactory {
 			break;
 		default: throw new IllegalStateException("Unknonwn b-computation style: " + B_COMPUTATION_STYLE);
 		}
-		if (DEBUG) assertEquals(ZERO, b.multiply(b).subtract(kN).mod(a));
+		if (DEBUG) assertEquals(I_0, b.multiply(b).subtract(kN).mod(a));
 		
 		BigInteger c = b.multiply(b).subtract(kN).divide(a);
 		BQF_xy bqf = new BQF_xy(k, N, kN, g, a, b, c);
