@@ -17,8 +17,6 @@ import java.math.BigInteger;
 
 import org.apache.log4j.Logger;
 
-import de.tilman_neumann.jml.BinarySearch;
-import de.tilman_neumann.jml.base.IntArray;
 import de.tilman_neumann.jml.factor.FactorException;
 import de.tilman_neumann.jml.modular.JacobiSymbol;
 import de.tilman_neumann.jml.primes.exact.AutoExpandingPrimesArray;
@@ -36,7 +34,6 @@ public class SpecialqFinder_big implements SpecialqFinder {
 	private int pMax;
 	private AutoExpandingPrimesArray primesArray = new AutoExpandingPrimesArray();
 	private JacobiSymbol jacobiEngine = new JacobiSymbol();
-	private BinarySearch binarySearch = new BinarySearch();
 	private int pIndex;
 	
 	@Override
