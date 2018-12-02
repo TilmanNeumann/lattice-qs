@@ -50,9 +50,7 @@ public class SpecialqFinder_big implements SpecialqFinder {
 		this.kN = kN;
 		this.pMax = pMax;
 		// compute first pIndex as the index of the first prime > pMax
-		primesArray.ensureLimit(2*pMax);
-		IntArray primes = primesArray.getPrimes();
-		this.pIndex = binarySearch.getFirstGreaterEntryIndex(primes.array, primes.count, pMax);
+		this.pIndex = primesArray.ensureLimit(2*pMax).getInsertPosition(pMax);
 	}
 	
 	@Override
