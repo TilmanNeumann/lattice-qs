@@ -23,6 +23,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 import de.tilman_neumann.jml.factor.SingleFactorFinder;
+import de.tilman_neumann.jml.factor.TestNumberNature;
 import de.tilman_neumann.jml.factor.TestsetGenerator;
 import de.tilman_neumann.jml.factor.base.congruence.*;
 import de.tilman_neumann.jml.factor.base.matrixSolver.*;
@@ -170,7 +171,7 @@ public class FactorizerTest {
 		BigInteger N_min = I_1.shiftLeft(bits-1);
 		// find N-set for square tests
 		//ArrayList NSet = TestsetGenerator.generate(bits, N_COUNT);
-		ArrayList<BigInteger> NSet = TestsetGenerator.generate(bits, N_COUNT);
+		ArrayList<BigInteger> NSet = TestsetGenerator.generate(N_COUNT, bits, TestNumberNature.MODERATE_SEMIPRIMES);
 		LOG.info("Test N with " + bits + " bits, i.e. N >= " + N_min);
 		
 		// take 3 timings for each algorithm to be quite sure that one timing is not falsified by garbage collection
