@@ -171,7 +171,7 @@ public class FactorizerTest {
 		BigInteger N_min = I_1.shiftLeft(bits-1);
 		// find N-set for square tests
 		//ArrayList NSet = TestsetGenerator.generate(bits, N_COUNT);
-		ArrayList<BigInteger> NSet = TestsetGenerator.generate(N_COUNT, bits, TestNumberNature.MODERATE_SEMIPRIMES);
+		BigInteger[] testNumbers = TestsetGenerator.generate(N_COUNT, bits, TestNumberNature.MODERATE_SEMIPRIMES);
 		LOG.info("Test N with " + bits + " bits, i.e. N >= " + N_min);
 		
 		// take 3 timings for each algorithm to be quite sure that one timing is not falsified by garbage collection
@@ -193,7 +193,7 @@ public class FactorizerTest {
 
 				int failCount = 0;
 				long startTimeMillis = System.currentTimeMillis();
-				for (BigInteger N : NSet) {
+				for (BigInteger N : testNumbers) {
 					BigInteger factor = algorithm.findSingleFactor(N);
 					// test correctness
 					if (factor==null || factor.equals(I_0) || factor.equals(I_1) || factor.mod(N).equals(I_0)) {
