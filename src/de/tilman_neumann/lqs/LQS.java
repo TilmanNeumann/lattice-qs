@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import de.tilman_neumann.jml.factor.FactorAlgorithmBase;
+import de.tilman_neumann.jml.factor.FactorAlgorithm;
 import de.tilman_neumann.jml.factor.FactorException;
 import de.tilman_neumann.jml.factor.base.PrimeBaseGenerator;
 import de.tilman_neumann.jml.factor.base.congruence.AQPair;
@@ -53,7 +53,7 @@ import de.tilman_neumann.util.Timer;
  * 
  * @author Tilman Neumann
  */
-public class LQS extends FactorAlgorithmBase {
+public class LQS extends FactorAlgorithm {
 	private static final Logger LOG = Logger.getLogger(LQS.class);
 	private static final boolean DEBUG = false;
 	

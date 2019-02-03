@@ -22,7 +22,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
-import de.tilman_neumann.jml.factor.SingleFactorFinder;
+import de.tilman_neumann.jml.factor.FactorAlgorithm;
 import de.tilman_neumann.jml.factor.TestNumberNature;
 import de.tilman_neumann.jml.factor.TestsetGenerator;
 import de.tilman_neumann.jml.factor.base.congruence.*;
@@ -67,10 +67,10 @@ public class FactorizerTest {
 	/** 
 	 * Algorithms to compare. Non-static to permit to use Loggers in the algorithm constructors.
 	 */
-	private SingleFactorFinder[] algorithms;
+	private FactorAlgorithm[] algorithms;
 	
 	public FactorizerTest() {
-		algorithms = new SingleFactorFinder[] {
+		algorithms = new FactorAlgorithm[] {
 
 			// Trial division: Fastest algorithm for N < 2^29
 //			new TDiv31Preload(),
@@ -175,9 +175,9 @@ public class FactorizerTest {
 		LOG.info("Test N with " + bits + " bits, i.e. N >= " + N_min);
 		
 		// take 3 timings for each algorithm to be quite sure that one timing is not falsified by garbage collection
-		TreeMap<Long, List<SingleFactorFinder>> ms_2_algorithms = new TreeMap<Long, List<SingleFactorFinder>>();
+		TreeMap<Long, List<FactorAlgorithm>> ms_2_algorithms = new TreeMap<Long, List<FactorAlgorithm>>();
 		for (int i=0; i<REPEATS; i++) {
-			for (SingleFactorFinder algorithm : algorithms) {
+			for (FactorAlgorithm algorithm : algorithms) {
 				// exclude special size implementations
 				String algName = algorithm.getName();
 				if (bits<45 && algName.startsWith("SIQS")) continue; // unstable for smaller N
@@ -211,8 +211,8 @@ public class FactorizerTest {
 				long endTimeMillis = System.currentTimeMillis();
 				long duration = endTimeMillis - startTimeMillis; // duration in ms
 				//LOG.debug("algorithm " + algName + " finished test set with " + bits + " bits");
-				List<SingleFactorFinder> algList = ms_2_algorithms.get(duration);
-				if (algList==null) algList = new ArrayList<SingleFactorFinder>();
+				List<FactorAlgorithm> algList = ms_2_algorithms.get(duration);
+				if (algList==null) algList = new ArrayList<FactorAlgorithm>();
 				algList.add(algorithm);
 				ms_2_algorithms.put(duration, algList);
 				if (failCount>0) {
@@ -224,9 +224,9 @@ public class FactorizerTest {
 		// log best algorithms first
 		int rank=1;
 		for (long ms : ms_2_algorithms.keySet()) {
-			List<SingleFactorFinder> algList = ms_2_algorithms.get(ms);
+			List<FactorAlgorithm> algList = ms_2_algorithms.get(ms);
 			int j=0;
-			for (SingleFactorFinder algorithm : algList) {
+			for (FactorAlgorithm algorithm : algList) {
 				String durationStr = TimeUtil.timeStr(ms);
 				LOG.info("#" + rank + ": Algorithm " + algorithm.getName() + " took " + durationStr);
 				j++;

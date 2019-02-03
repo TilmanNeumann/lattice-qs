@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import de.tilman_neumann.jml.factor.FactorAlgorithmBase;
+import de.tilman_neumann.jml.factor.FactorAlgorithm;
 import de.tilman_neumann.jml.factor.FactorException;
 import de.tilman_neumann.jml.factor.base.PrimeBaseGenerator;
 import de.tilman_neumann.jml.factor.base.congruence.AQPair;
@@ -54,7 +54,7 @@ import de.tilman_neumann.util.Timer;
  * @author Tilman Neumann
  */
 // TODO fix too many solver runs issue with small special q
-public class LQS_smallq extends FactorAlgorithmBase {
+public class LQS_smallq extends FactorAlgorithm {
 	private static final Logger LOG = Logger.getLogger(LQS_smallq.class);
 	private static final boolean DEBUG = false;
 	
