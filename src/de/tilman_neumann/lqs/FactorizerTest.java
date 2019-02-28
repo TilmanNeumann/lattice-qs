@@ -169,8 +169,6 @@ public class FactorizerTest {
 	
 	private void testRange(int bits) {
 		BigInteger N_min = I_1.shiftLeft(bits-1);
-		// find N-set for square tests
-		//ArrayList NSet = TestsetGenerator.generate(bits, N_COUNT);
 		BigInteger[] testNumbers = TestsetGenerator.generate(N_COUNT, bits, TestNumberNature.MODERATE_SEMIPRIMES);
 		LOG.info("Test N with " + bits + " bits, i.e. N >= " + N_min);
 		
