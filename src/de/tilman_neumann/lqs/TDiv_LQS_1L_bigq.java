@@ -13,6 +13,10 @@
  */
 package de.tilman_neumann.lqs;
 
+import static de.tilman_neumann.jml.factor.base.AnalysisOptions.*;
+import static de.tilman_neumann.jml.base.BigIntConstants.*;
+import static org.junit.Assert.*;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +32,6 @@ import de.tilman_neumann.jml.factor.base.congruence.AQPairFactory;
 import de.tilman_neumann.jml.factor.siqs.tdiv.TDivReport;
 import de.tilman_neumann.util.SortedMultiset;
 import de.tilman_neumann.util.Timer;
-
-import static de.tilman_neumann.jml.base.BigIntConstants.*;
-import static org.junit.Assert.*;
 
 /**
  * A trial division engine where partials can have several large factors.
@@ -64,7 +65,6 @@ public class TDiv_LQS_1L_bigq implements TDiv_LQS {
 	private AQPairFactory aqPairFactory = new AQPairFactory();
 
 	// statistics
-	private boolean profile;
 	private Timer timer = new Timer();
 	private long testCount, sufficientSmoothCount;
 	private long duration;
@@ -84,7 +84,7 @@ public class TDiv_LQS_1L_bigq implements TDiv_LQS {
 	 * @see de.tilman_neumann.lqs.TDiv_LQS#initializeForN(int, java.math.BigInteger, double, java.math.BigInteger, double, int[], int, boolean)
 	 */
 	@Override
-	public void initializeForN(int k, BigInteger N, double N_dbl, BigInteger kN, double maxQRest,int[] primesArray, int baseSize, boolean profile) {
+	public void initializeForN(int k, BigInteger N, double N_dbl, BigInteger kN, double maxQRest, int[] primesArray, int baseSize) {
 		this.kN = kN;
 		// the biggest unfactored rest where some Q is considered smooth enough for a congruence.
 		this.maxQRest = maxQRest;
@@ -95,10 +95,8 @@ public class TDiv_LQS_1L_bigq implements TDiv_LQS {
 		this.baseSize = baseSize;
 
 		// statistics
-		this.profile = profile;
-		this.testCount = 0;
-		this.sufficientSmoothCount = 0;
-		this.duration = 0;
+		if (ANALYZE) testCount = sufficientSmoothCount = 0;
+		if (ANALYZE) this.duration = 0;
 	}
 
 	/* (non-Javadoc)
@@ -115,14 +113,14 @@ public class TDiv_LQS_1L_bigq implements TDiv_LQS {
 	 */
 	@Override
 	public List<AQPair> testList(ArrayList<IntPair> xyList) {
-		timer.capture();
+		if (ANALYZE) timer.capture();
 
 		// do trial division with sieve result
 		ArrayList<AQPair> aqPairs = new ArrayList<AQPair>();
 		for (IntPair xy : xyList) {
 			smallFactors.reset();
 			bigFactors.reset();
-			testCount++;
+			if (ANALYZE) testCount++;
 			
 			int x = xy.x;
 			int y = xy.y;
@@ -131,15 +129,15 @@ public class TDiv_LQS_1L_bigq implements TDiv_LQS {
 			if (aqPair != null) {
 				// Q(x) was found sufficiently smooth to be considered a (partial) congruence
 				aqPairs.add(aqPair);
-				sufficientSmoothCount++;
+				if (ANALYZE) sufficientSmoothCount++;
 				if (DEBUG) {
 					BigInteger A = aqPair.getA();
 					LOG.debug("kN = " + kN + ": Found congruence " + aqPair);
 					assertEquals(A.multiply(A).mod(kN), Q.mod(kN));
 					// make sure that the product of factors gives Q
-					SortedMultiset<Integer> allQFactors = aqPair.getAllQFactors();
+					SortedMultiset<Long> allQFactors = aqPair.getAllQFactors();
 					BigInteger testProduct = I_1;
-					for (Map.Entry<Integer, Integer> entry : allQFactors.entrySet()) {
+					for (Map.Entry<Long, Integer> entry : allQFactors.entrySet()) {
 						BigInteger prime = BigInteger.valueOf(entry.getKey());
 						int exponent = entry.getValue();
 						testProduct = testProduct.multiply(prime.pow(exponent));
@@ -148,7 +146,7 @@ public class TDiv_LQS_1L_bigq implements TDiv_LQS {
 				}
 			}
 		}
-		if (profile) duration += timer.capture();
+		if (ANALYZE) duration += timer.capture();
 		return aqPairs;
 	}
 	
@@ -241,7 +239,7 @@ public class TDiv_LQS_1L_bigq implements TDiv_LQS {
 	 */
 	@Override
 	public TDivReport getReport() {
-		return new TDivReport(testCount, sufficientSmoothCount, duration);
+		return new TDivReport(testCount, sufficientSmoothCount, duration, 0, 0, 0, 0, null);
 	}
 	
 	/* (non-Javadoc)

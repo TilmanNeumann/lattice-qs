@@ -27,7 +27,7 @@ public interface LatticeSieve {
 
 	String getName();
 	
-	void initializeForN(int k, BigInteger N, BigInteger kN, int[] primesArray, int[] tArray, int primeBaseSize, LQSSieveParams sieveParams, BQF_xy Qxy, boolean profile);
+	void initializeForN(int k, BigInteger N, BigInteger kN, int[] primesArray, int[] tArray, int primeBaseSize, LQSSieveParams sieveParams, BQF_xy Qxy);
 	
 	ArrayList<IntPair> sieve(int q, byte[] logPArray, byte[][] sieveArray, byte[] initializedSieveLine, byte[][] dontUseArray, int sieveArraySideLength) throws FactorException;
 

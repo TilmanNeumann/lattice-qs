@@ -13,6 +13,10 @@
  */
 package de.tilman_neumann.lqs;
 
+import static de.tilman_neumann.jml.factor.base.AnalysisOptions.*;
+import static de.tilman_neumann.jml.base.BigIntConstants.*;
+import static org.junit.Assert.*;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +41,6 @@ import de.tilman_neumann.jml.factor.squfof.SquFoF63;
 import de.tilman_neumann.jml.primes.probable.BPSWTest;
 import de.tilman_neumann.util.SortedMultiset;
 import de.tilman_neumann.util.Timer;
-
-import static de.tilman_neumann.jml.base.BigIntConstants.*;
-import static org.junit.Assert.*;
 
 /**
  * A trial division engine where partials can have several large factors.
@@ -81,7 +82,6 @@ public class TDiv_LQS_smallq implements TDiv_LQS {
 	private AQPairFactory aqPairFactory = new AQPairFactory();
 
 	// statistics
-	private boolean profile;
 	private Timer timer = new Timer();
 	private long testCount, sufficientSmoothCount;
 	private long duration;
@@ -91,14 +91,14 @@ public class TDiv_LQS_smallq implements TDiv_LQS {
 		this.squFoF31 = new SquFoF31();
 		this.squFoF63 = new SquFoF63();
 		// XXX For safety reasons we do not use Sieve03gU yet for the internal quadratic sieve
-		this.qsInternal = new SIQS(0.32F, 0.37F, null, 0.16F, new PowerOfSmallPrimesFinder(), new SIQSPolyGenerator(), new Sieve03g(), new TDiv_QS_1Large_UBI(), 10, new MatrixSolver01_Gauss(), false);
+		this.qsInternal = new SIQS(0.32F, 0.37F, null, 0.16F, new PowerOfSmallPrimesFinder(), new SIQSPolyGenerator(), new Sieve03g(), new TDiv_QS_1Large_UBI(), 10, new MatrixSolver01_Gauss());
 	}
 
 	public String getName() {
 		return "TDiv_smallq";
 	}
 
-	public void initializeForN(int k, BigInteger N, double N_dbl, BigInteger kN, double maxQRest,int[] primesArray, int baseSize, boolean profile) {
+	public void initializeForN(int k, BigInteger N, double N_dbl, BigInteger kN, double maxQRest, int[] primesArray, int baseSize) {
 		this.kN = kN;
 		// the biggest unfactored rest where some Q is considered smooth enough for a congruence.
 		this.maxQRest = maxQRest;
@@ -111,10 +111,8 @@ public class TDiv_LQS_smallq implements TDiv_LQS {
 		pMaxSquare = BigInteger.valueOf(pMax * (long) pMax);
 
 		// statistics
-		this.profile = profile;
-		this.testCount = 0;
-		this.sufficientSmoothCount = 0;
-		this.duration = 0;
+		if (ANALYZE) testCount = sufficientSmoothCount = 0;
+		if (ANALYZE) this.duration = 0;
 	}
 
 	public void initializeForSpecialQ(int special_q, BQF_xy bqf) {
@@ -123,14 +121,14 @@ public class TDiv_LQS_smallq implements TDiv_LQS {
 	}
 
 	public List<AQPair> testList(ArrayList<IntPair> xyList) {
-		timer.capture();
+		if (ANALYZE) timer.capture();
 
 		// do trial division with sieve result
 		ArrayList<AQPair> aqPairs = new ArrayList<AQPair>();
 		for (IntPair xy : xyList) {
 			smallFactors.reset();
 			bigFactors.reset();
-			testCount++;
+			if (ANALYZE) testCount++;
 			
 			int x = xy.x;
 			int y = xy.y;
@@ -139,15 +137,15 @@ public class TDiv_LQS_smallq implements TDiv_LQS {
 			if (aqPair != null) {
 				// Q(x) was found sufficiently smooth to be considered a (partial) congruence
 				aqPairs.add(aqPair);
-				sufficientSmoothCount++;
+				if (ANALYZE) sufficientSmoothCount++;
 				if (DEBUG) {
 					BigInteger A = aqPair.getA();
 					LOG.debug("kN = " + kN + ": Found congruence " + aqPair);
 					assertEquals(A.multiply(A).mod(kN), Q.mod(kN));
 					// make sure that the product of factors gives Q
-					SortedMultiset<Integer> allQFactors = aqPair.getAllQFactors();
+					SortedMultiset<Long> allQFactors = aqPair.getAllQFactors();
 					BigInteger testProduct = I_1;
-					for (Map.Entry<Integer, Integer> entry : allQFactors.entrySet()) {
+					for (Map.Entry<Long, Integer> entry : allQFactors.entrySet()) {
 						BigInteger prime = BigInteger.valueOf(entry.getKey());
 						int exponent = entry.getValue();
 						testProduct = testProduct.multiply(prime.pow(exponent));
@@ -156,7 +154,7 @@ public class TDiv_LQS_smallq implements TDiv_LQS {
 				}
 			}
 		}
-		if (profile) duration += timer.capture();
+		if (ANALYZE) duration += timer.capture();
 		return aqPairs;
 	}
 	
@@ -285,7 +283,7 @@ public class TDiv_LQS_smallq implements TDiv_LQS {
 	}
 
 	public TDivReport getReport() {
-		return new TDivReport(testCount, sufficientSmoothCount, duration);
+		return new TDivReport(testCount, sufficientSmoothCount, duration, 0, 0, 0, 0, null);
 	}
 	
 	public void cleanUp() {

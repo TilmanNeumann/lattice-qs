@@ -13,6 +13,7 @@
  */
 package de.tilman_neumann.lqs;
 
+import static de.tilman_neumann.jml.factor.base.AnalysisOptions.*;
 import static de.tilman_neumann.jml.base.BigIntConstants.*;
 
 import java.io.BufferedReader;
@@ -35,7 +36,6 @@ import de.tilman_neumann.jml.factor.base.matrixSolver.FactorTest;
 import de.tilman_neumann.jml.factor.base.matrixSolver.FactorTest01;
 import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver;
 import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver02_BlockLanczos;
-import de.tilman_neumann.jml.factor.base.matrixSolver.SmoothSolverController;
 import de.tilman_neumann.jml.factor.siqs.KnuthSchroeppel;
 import de.tilman_neumann.jml.factor.siqs.ModularSqrtsEngine;
 import de.tilman_neumann.jml.factor.siqs.sieve.SieveReport;
@@ -57,9 +57,6 @@ import de.tilman_neumann.util.Timer;
 public class LQS_smallq extends FactorAlgorithm {
 	private static final Logger LOG = Logger.getLogger(LQS_smallq.class);
 	private static final boolean DEBUG = false;
-	
-	// use profile=true to generate timing informations
-	private boolean profile = true;
 
 	private PurePowerTest powerTest = new PurePowerTest();
 	private KnuthSchroeppel multiplierFinder = new KnuthSchroeppel(); // used to compute the multiplier k
@@ -91,10 +88,15 @@ public class LQS_smallq extends FactorAlgorithm {
 	
 	// collects the congruences we find
 	private CongruenceCollector congruenceCollector;
-	// A controller for the solver used for smooth congruence equation systems.
-	private SmoothSolverController solverController;
+	// The solver used for smooth congruence equation systems.
+	private MatrixSolver matrixSolver;
 	
-	public LQS_smallq(float Cmult, float Mmult, int minLnPSumStyle, Float maxQRestExponent, int extraCongruences, SpecialqFinder specialqFinder, LatticeSieve latticeSieve, TDiv_LQS tdivEngine, MatrixSolver matrixSolver, boolean profile) {
+	// statistics
+	private Timer timer = new Timer();
+	private long powerTestDuration, initNDuration, initPolyDuration, ccDuration, solverDuration;
+	private int solverRunCount;
+
+	public LQS_smallq(float Cmult, float Mmult, int minLnPSumStyle, Float maxQRestExponent, int extraCongruences, SpecialqFinder specialqFinder, LatticeSieve latticeSieve, TDiv_LQS tdivEngine, MatrixSolver matrixSolver) {
 		this.Cmult = Cmult;
 		this.Mmult = Mmult;
 		this.minLnPSumStyle = minLnPSumStyle;
@@ -104,14 +106,13 @@ public class LQS_smallq extends FactorAlgorithm {
 		this.auxFactorizer = tdivEngine;
 		this.extraCongruences = extraCongruences;
 		this.congruenceCollector = new CongruenceCollector();
-		this.solverController = new SmoothSolverController(matrixSolver);
-		this.profile = profile;
+		this.matrixSolver = matrixSolver;
 	}
 
 	@Override
 	public String getName() {
 		String maxQRestExponentStr = "maxQRestExponent=" + String.format("%.3f", maxQRestExponent);
-		return "LQS_smallq(Cmult=" + Cmult + ", Mmult=" + Mmult + ", sieveArraySideLength=" + sieveArraySideLength + ", minLnPSumStyle = " + minLnPSumStyle + ", " + maxQRestExponentStr + ", " + specialqFinder.getName() + ", " + latticeSieve.getName() + ", " + auxFactorizer.getName() + ", " + solverController.getName() + ")";
+		return "LQS_smallq(Cmult=" + Cmult + ", Mmult=" + Mmult + ", sieveArraySideLength=" + sieveArraySideLength + ", minLnPSumStyle = " + minLnPSumStyle + ", " + maxQRestExponentStr + ", " + specialqFinder.getName() + ", " + latticeSieve.getName() + ", " + auxFactorizer.getName() + ", " + matrixSolver.getName() + ")";
 	}
 	
 	/**
@@ -119,13 +120,11 @@ public class LQS_smallq extends FactorAlgorithm {
 	 * @return factor, or null if no factor was found.
 	 */
 	public BigInteger findSingleFactor(BigInteger N) {
-		Timer timer = new Timer(); // start timer
-		long powerTestDuration = 0;
-		long initNDuration = 0;
-		long initPolyDuration = 0;
-		long ccDuration = 0;
-		long solverDuration = 0;
-		long solverRunCount = 0;
+		if (ANALYZE) {
+			timer.start(); // start timer
+			powerTestDuration = initNDuration = initPolyDuration = ccDuration = solverDuration = 0;
+			solverRunCount = 0;
+		}
 
 		// the quadratic sieve does not work for pure powers; check that first:
 		PurePowerTest.Result purePower = powerTest.test(N);
@@ -135,7 +134,7 @@ public class LQS_smallq extends FactorAlgorithm {
 			LOG.info("N is a pure power -> found factor " + factor);
 			return factor;
 		} // else: no pure power, run quadratic sieve
-		if (profile) powerTestDuration += timer.capture();
+		if (ANALYZE) powerTestDuration += timer.capture();
 
 		// compute Knuth-Schroppel multiplier
 		int k = multiplierFinder.computeMultiplier(N);
@@ -225,15 +224,15 @@ public class LQS_smallq extends FactorAlgorithm {
 		byte[][] dontUseArray = computeDontUseArray(sieveArraySideLength);
 		
 		// initialize sub-algorithms for new N
-		latticeSieve.initializeForN(k, N, kN, primesArray, tArray, primeBaseSize, sieveParams, bqf, profile);
+		latticeSieve.initializeForN(k, N, kN, primesArray, tArray, primeBaseSize, sieveParams, bqf);
 		FactorTest factorTest = new FactorTest01(N);
-		auxFactorizer.initializeForN(k, N, N_dbl, kN, maxQRest, primesArray, primeBaseSize, profile);
-		congruenceCollector.initialize(N, factorTest, profile);
-		solverController.initialize(N, factorTest);
+		auxFactorizer.initializeForN(k, N, N_dbl, kN, maxQRest, primesArray, primeBaseSize);
+		congruenceCollector.initialize(N, factorTest);
+		matrixSolver.initialize(N, factorTest);
 		
 		try {
 			specialqFinder.initializeForN(N, kN, pMax);
-			if (profile) initNDuration += timer.capture();
+			if (ANALYZE) initNDuration += timer.capture();
 			
 			// "special_q" loop
 			while (true) {
@@ -241,7 +240,7 @@ public class LQS_smallq extends FactorAlgorithm {
 				// We want q to be int, and slightly bigger than the prime base.
 				int specialQ = specialqFinder.nextSpecialQ();
 				// TODO Perform tests to find the optimal size of special q. Also consider q < pMax !
-				if (profile) initPolyDuration += timer.capture();
+				if (ANALYZE) initPolyDuration += timer.capture();
 			
 				auxFactorizer.initializeForSpecialQ(specialQ, bqf);
 				
@@ -254,7 +253,7 @@ public class LQS_smallq extends FactorAlgorithm {
 				if (DEBUG) LOG.debug("Trial division found " + aqPairs.size() + " Q(x) smooth enough for a congruence.");
 
 				// add all congruences
-				if (profile) timer.capture();
+				if (ANALYZE) timer.capture();
 				for (AQPair aqPair : aqPairs) {
 					boolean addedSmooth = congruenceCollector.add(aqPair);
 					if (addedSmooth) {
@@ -262,11 +261,13 @@ public class LQS_smallq extends FactorAlgorithm {
 						if (DEBUG) LOG.info("Found smooth congruence #" + smoothCongruenceCount);
 						if (smoothCongruenceCount >= requiredSmoothCongruenceCount) {
 							// Try to solve equation system
-							if (profile) ccDuration += timer.capture();
-							solverRunCount++;
-							if (DEBUG) LOG.debug("Run " + solverRunCount + ": #smooths = " + smoothCongruenceCount + ", #requiredSmooths = " + requiredSmoothCongruenceCount);
+							if (ANALYZE) {
+								ccDuration += timer.capture();
+								solverRunCount++;
+								if (DEBUG) LOG.debug("Run " + solverRunCount + ": #smooths = " + smoothCongruenceCount + ", #requiredSmooths = " + requiredSmoothCongruenceCount);
+							}
 							ArrayList<Smooth> congruences = congruenceCollector.getSmoothCongruences();
-							solverController.solve(congruences); // throws FactorException
+							matrixSolver.solve(congruences); // throws FactorException
 							
 							// If we get here then there was no FactorException
 							if (DEBUG) {
@@ -277,13 +278,13 @@ public class LQS_smallq extends FactorAlgorithm {
 								}
 							}
 							
-							if (profile) solverDuration += timer.capture();
+							if (ANALYZE) solverDuration += timer.capture();
 							// Extend equation system and continue searching smooth congruences
 							requiredSmoothCongruenceCount += extraCongruences;
 						}
 					} // else: new partial found
 				} // end (special q)
-				if (profile) ccDuration += timer.capture();
+				if (ANALYZE) ccDuration += timer.capture();
 				if (DEBUG) {
 					LOG.debug("'special q' = " + specialQ + ": Sieve found " + smoothCandidatesFromLatticeSieve.size() + " smooth (x,y), tDiv let " + aqPairs.size() + " pass.");
 					LOG.debug("-> Now in total we have found " + congruenceCollector.getSmoothCongruenceCount() + " / " + requiredSmoothCongruenceCount + " smooth congruences and " + congruenceCollector.getPartialCongruenceCount() + " partials.");
@@ -291,7 +292,7 @@ public class LQS_smallq extends FactorAlgorithm {
 			}
 		} catch (FactorException fe) {
 			BigInteger factor = fe.getFactor();
-			if (profile) {
+			if (ANALYZE) {
 				solverDuration += timer.capture();
 				// get all reports
 				SieveReport sieveReport = latticeSieve.getReport();
@@ -309,16 +310,16 @@ public class LQS_smallq extends FactorAlgorithm {
 				LOG.info("    multiplier k = " + k + ", kN%8 = " + kN.mod(I_8) + ", primeBaseSize = " + primeBaseSize + ", pMax = " + pMax + " (" + pMaxBits + " bits), sieveArrayArea = " + sieveArrayArea);
 				LOG.info("    tDiv: " + tdivReport.getOperationDetails());
 				LOG.info("    cc: " + ccReport.getOperationDetails());
-				if (CongruenceCollector.ANALYZE_BIG_FACTOR_SIZES) {
+				if (ANALYZE_LARGE_FACTOR_SIZES) {
 					LOG.info("        " + ccReport.getPartialBigFactorSizes());
 					LOG.info("        " + ccReport.getSmoothBigFactorSizes());
 					LOG.info("        " + ccReport.getNonIntFactorPercentages());
 				}
-				if (CongruenceCollector.ANALYZE_Q_SIGNS) {
+				if (ANALYZE_Q_SIGNS) {
 					LOG.info("        " + ccReport.getPartialQSignCounts());
 					LOG.info("        " + ccReport.getSmoothQSignCounts());
 				}
-				LOG.info("    #solverRuns = " + solverRunCount + ", #tested null vectors = " + solverController.getTestedNullVectorCount());
+				LOG.info("    #solverRuns = " + solverRunCount + ", #tested null vectors = " + matrixSolver.getTestedNullVectorCount());
 				LOG.info("    Approximate phase timings: powerTest=" + powerTestDuration + "ms, initN=" + initNDuration + "ms, initPoly=" + initPolyDuration + "ms, sieve=" + sieveDuration + "ms, tdiv=" + tdivDuration + "ms, cc=" + ccDuration + "ms, solver=" + solverDuration + "ms");
 				LOG.info("    -> sieve sub-timings: " + sieveReport.getPhaseTimings(1));
 				// TODO: TDiv, CC and solver have no sub-timings yet
@@ -409,7 +410,7 @@ public class LQS_smallq extends FactorAlgorithm {
 	 */
 	private static void testInput() {
 		//LQS_smallq qs = new LQS_smallq(0.32F, 0.55F, 1, null, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_bigq(), new MatrixSolver02_BlockLanczos(), true);
-		LQS_smallq qs = new LQS_smallq(0.32F, 0.55F, 1, null, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver02_BlockLanczos(), true);
+		LQS_smallq qs = new LQS_smallq(0.32F, 0.55F, 1, null, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver02_BlockLanczos());
 
 		Timer timer = new Timer();
 		while(true) {

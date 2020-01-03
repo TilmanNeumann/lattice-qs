@@ -13,6 +13,7 @@
  */
 package de.tilman_neumann.lqs;
 
+import static de.tilman_neumann.jml.factor.base.AnalysisOptions.*;
 import static de.tilman_neumann.jml.base.BigIntConstants.I_0;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -67,7 +68,6 @@ public class LatticeVectorSieve implements LatticeSieve {
 	private BQF Qxy;
 
 	// profiling
-	private boolean profile;
 	private Timer timer = new Timer();
 	private long initDuration, sieveDuration, collectDuration;
 
@@ -77,7 +77,7 @@ public class LatticeVectorSieve implements LatticeSieve {
 	}
 	
 	@Override
-	public void initializeForN(int k, BigInteger N, BigInteger kN, int[] primesArray, int[] tArray, int primeBaseSize, LQSSieveParams sieveParams, BQF_xy Qxy, boolean profile) {
+	public void initializeForN(int k, BigInteger N, BigInteger kN, int[] primesArray, int[] tArray, int primeBaseSize, LQSSieveParams sieveParams, BQF_xy Qxy) {
 		this.k = k;
 		this.N = N;
 		this.kN = kN;
@@ -96,14 +96,12 @@ public class LatticeVectorSieve implements LatticeSieve {
 		
 		this.Qxy = Qxy;
 
-		// profiling
-		this.profile = profile;
-		initDuration = sieveDuration = collectDuration = 0;
+		if (ANALYZE) initDuration = sieveDuration = collectDuration = 0;
 	}
 
 	@Override
 	public ArrayList<IntPair> sieve(int q, byte[] logPArray, byte[][] sieveArray, byte[] initializedSieveLine, byte[][] dontUseArray, int sieveArraySideLength) throws FactorException {
-		if (profile) timer.capture();
+		if (ANALYZE) timer.capture();
 
 		// Compute modular sqrt of kN (mod q)
 		int kN_mod_q = kN_UBI.mod(q);
@@ -225,11 +223,11 @@ public class LatticeVectorSieve implements LatticeSieve {
 				assertTrue(Q.mod(BigInteger.valueOf(p)).intValue() == 0); // works for exactly orthogonal sublattice case, too
 				//assertTrue(qpBase1.b10 != 0); // wrong, we still get exactly orthogonal sublattices
 			}
-			if (profile) initDuration += timer.capture();
+			if (ANALYZE) initDuration += timer.capture();
 			
 			byte logP = logPArray[i];
 			sieveOneP(qBase, p, qpBase1, eMin, eMax, fMin, fMax, sieveArray, sieveArraySideLength, halfSieveArraySideLength, logP);
-			if (profile) sieveDuration += timer.capture();
+			if (ANALYZE) sieveDuration += timer.capture();
 
 			if (qpRoots[0] != qpRoots[1]) {
 				// There is a second solution
@@ -246,10 +244,10 @@ public class LatticeVectorSieve implements LatticeSieve {
 					assertTrue(Q.mod(BigInteger.valueOf(p)).intValue() == 0); // works for exactly orthogonal sublattice case, too
 					//assertTrue(qpBase2.b10 != 0); // wrong, we still get exactly orthogonal sublattices
 				}
-				if (profile) initDuration += timer.capture();
+				if (ANALYZE) initDuration += timer.capture();
 				
 				sieveOneP(qBase, p, qpBase2, eMin, eMax, fMin, fMax, sieveArray, sieveArraySideLength, halfSieveArraySideLength, logP);
-				if (profile) sieveDuration += timer.capture();
+				if (ANALYZE) sieveDuration += timer.capture();
 			} else {
 				if (DEBUG) LOG.info("p = " + p + " has only one sublattice!");
 			}
@@ -257,7 +255,7 @@ public class LatticeVectorSieve implements LatticeSieve {
 		
 		// Collect sieve results
 		ArrayList<IntPair> smoothCandidates = collectOneRoot(q, qBase, eMin, eMax, fMin, fMax, sieveArray, dontUseArray, halfSieveArraySideLength);
-		if (profile) collectDuration += timer.capture();
+		if (ANALYZE) collectDuration += timer.capture();
 		return smoothCandidates;
 	}
 
