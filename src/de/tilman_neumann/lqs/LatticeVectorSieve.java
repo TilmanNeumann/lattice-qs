@@ -483,7 +483,7 @@ public class LatticeVectorSieve implements LatticeSieve {
 		int w1 = qBase.b20;
 		int w2 = qBase.b21;
 		
-		ArrayList<IntPair> allSmooths = new ArrayList<IntPair>();
+		ArrayList<IntPair> allSmooths = TEST_SIEVE_ARRAY ? new ArrayList<IntPair>() : null;
 		ArrayList<IntPair> foundSmooths = new ArrayList<IntPair>();
 		for (int e = eMin; e<=eMax; e++) {
 			final int eIndex = e+halfSieveArraySideLength;
