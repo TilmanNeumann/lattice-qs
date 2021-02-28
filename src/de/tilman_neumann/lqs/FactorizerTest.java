@@ -22,6 +22,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
+import de.tilman_neumann.jml.factor.CombinedFactorAlgorithm;
 import de.tilman_neumann.jml.factor.FactorAlgorithm;
 import de.tilman_neumann.jml.factor.TestNumberNature;
 import de.tilman_neumann.jml.factor.TestsetGenerator;
@@ -72,75 +73,14 @@ public class FactorizerTest {
 	public FactorizerTest() {
 		algorithms = new FactorAlgorithm[] {
 
-			// Trial division: Fastest algorithm for N < 2^29
-//			new TDiv31Preload(),
-				
-			// Lehman: never the best, works until 45 bit
-			//new Lehman(),
-
-			// PollardRho:
-			// * never the best algorithm
-			// * Best BigInteger version is PollardRhoBrent
-			//new PollardRho(),
-			//new PollardRho_ProductGcd(),
-//			new PollardRhoBrent(),
-			//new PollardRho31(),
-
-			// SquFoF variants
-			// * SquFoF31 is the best algorithm overall for N = 2^29...2^52, SquFoF63 for N = 2^52...2^60
-			// * best multiplier sequence = 1680 * {squarefree sequence}
-			// * best stopping criterion = O(5.th root(N))
-//			new SquFoF63(), // best algorithm for N = 2^52...2^60 (freezes at some N > 2^90)
-//			new SquFoF31(), // best algorithm for N = 2^29...2^52
-			
 			// CFrac
-			// * never the best algorithm: SquFoF63 is better for N <= 66 bit, SIQS is better for N >= 55 bits
-			// * stopRoot, stopMult: if big enough, then a second k is rarely needed; (5, 1.5) is good
-			// * TDiv_CF01 is good for N < 80 bits; for N > 90 bit we need TDiv_CF02
-//			new CFrac01(true, 5, 1.5F, 0.152F, 0.253F, new TDiv_CF01(), 10, new MatrixSolver01_Gauss(), 5),
-//			new CFrac01(true, 5, 1.5F, 0.152F, 0.253F, new TDiv_CF02(), 10, new MatrixSolver01_Gauss(), 5),
-//			new CFrac63_01(true, 5, 1.5F, 0.152F, 0.25F, new TDiv_CF63_01(), 10, new MatrixSolver01_Gauss(), 12),
-//			new CFrac63_01(true, 5, 1.5F, 0.152F, 0.25F, new TDiv_CF63_02(), 10, new MatrixSolver01_Gauss(), 12),
+//			new CFrac(true, 5, 1.5F, 0.152F, 0.253F, new TDiv_CF02(), 10, new MatrixSolver01_Gauss(), 5),
 
-			// SIQS:
-			// * TDiv: UBI-variants are better than BigInteger-variants; nLarge is better than 1Large for N >= 200 bit
-			// * BlockLanczos is better than Gauss for about N>200 bit
-			//new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new SimpleSieve(), new TDiv_QS_1Large(), 10, new MatrixSolver01_Gauss()),
-//			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03g(), new TDiv_QS_1Large_UBI(), 10, new MatrixSolver01_Gauss()),
-//			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_1Large_UBI(), 10, new MatrixSolver01_Gauss()),
+			// SIQS
+			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_nLarge_UBI(true), 10, new MatrixSolver02_BlockLanczos()),
 
-//			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03g(), new TDiv_QS_1Large_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-//			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03g(), new TDiv_QS_2Large_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-//			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03g(), new TDiv_QS_nLarge(), 10, new MatrixSolver02_BlockLanczos()),
-//			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03g(), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-//			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-
-			// sieving with prime powers: best sieve for small N!
-//			new SIQS(0.32F, 0.37F, null, null, new PowerOfSmallPrimesFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_1Large_UBI(), 10, new MatrixSolver01_Gauss()),
-//			new SIQS(0.32F, 0.37F, null, null, new PowerOfSmallPrimesFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-//			new SIQS(0.32F, 0.37F, null, null, new AllPowerFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-			
-			// segmented sieve: slower; best block size is about 32k
-//			new SIQS(0.32F, 0.385F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new SingleBlockSieve(32768), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-//			new SIQS(0.32F, 0.385F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new SingleBlockSieveU(32768), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-//			new SIQS(0.32F, 0.41F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new DoubleBlockSieve(32768, 131072), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-	
-			// hybrid sieves:
-			// * single block hybrid is level with Sieve03g
-			// * best block size is about 32k (my processor has 16kB L1 cache, 128kB L2-cache per thread)
-//			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new SingleBlockHybridSieve01(32768), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-//			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new SingleBlockHybridSieveU(32768), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-//			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new DoubleBlockHybridSieve01(32768, 131072), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-//			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new DoubleBlockHybridSieveU(32768, 131072), new TDiv_QS_nLarge_UBI(), 10, new MatrixSolver02_BlockLanczos()),
-
-			// Multi-threaded SIQS:
-			// * 4/6 threads takes over at N around 100 bit (more exact estimates: 4 threads best for N>=88 bits, 6 threads for N>=112 bits)
-			// * we need 0.14 < maxQRestExponent < 0.2; everything else is prohibitive; use null for dynamic determination
-			// * BlockLanczos is better than Gauss solver for N > 200 bit
+			// Multi-threaded SIQS
 //			new PSIQS_U(0.32F, 0.37F, null, null, 6, new NoPowerFinder(), new MatrixSolver02_BlockLanczos()),
-			new PSIQS_U(0.32F, 0.37F, null, null, 6, new PowerOfSmallPrimesFinder(), new MatrixSolver02_BlockLanczos()),
-//			new PSIQS_U(0.32F, 0.37F, null, null, 6, new AllPowerFinder(), new MatrixSolver02_BlockLanczos()),
-//			new PSIQS_SBH_U(0.32F, 0.37F, null, null, 32768, 6, new PowerOfSmallPrimesFinder(), new MatrixSolver02_BlockLanczos()), // best for large N
 
 			// Combination of best algorithms for all factor argument sizes
 //			new CombinedFactorAlgorithm(4),

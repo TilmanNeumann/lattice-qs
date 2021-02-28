@@ -13,7 +13,7 @@
  */
 package de.tilman_neumann.lqs;
 
-import static de.tilman_neumann.jml.factor.base.AnalysisOptions.*;
+import static de.tilman_neumann.jml.factor.base.GlobalFactoringOptions.*;
 import static de.tilman_neumann.jml.base.BigIntConstants.I_0;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
