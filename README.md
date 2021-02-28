@@ -17,7 +17,7 @@ But beware: I wrote it without having seen Pollard's "The lattice sieve" paper, 
 
 Clone the repository, create a plain Java project importing it, make sure that 'src' is the source folder of your project, and add the jars from the lib-folder to your classpath. 
 
-You will need Java 8 or higher for the project to compile.
+You will need <strong>Java 9</strong> or higher for the project to compile.
 
 There is no documentation and no support, so you should be ready to start exploring the source code.
 
