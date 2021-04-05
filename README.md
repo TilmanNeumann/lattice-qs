@@ -2,7 +2,7 @@
 
 A study of a "lattice quadratic sieve" proposed by R.D.Silverman in https://www.mersenneforum.org/showthread.php?t=14080.
 
-The algorithm is not competitive with SIQS, rather comparable to a good CFrac implementation. The biggest number I factored yet
+The algorithm is not competitive with SIQS, only slightly faster than a good CFrac implementation. The biggest number I factored yet
 using it had 220 bit, and that took around 40 minutes.
 
 Nonetheless, eventually the implementation of the lattice sieve might be interesting to some people.

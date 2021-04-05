@@ -29,13 +29,9 @@ import de.tilman_neumann.jml.factor.base.SortedIntegerArray;
 import de.tilman_neumann.jml.factor.base.SortedLongArray;
 import de.tilman_neumann.jml.factor.base.congruence.AQPair;
 import de.tilman_neumann.jml.factor.base.congruence.AQPairFactory;
-import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver01_Gauss;
-import de.tilman_neumann.jml.factor.siqs.SIQS;
+import de.tilman_neumann.jml.factor.siqs.SIQS_Small;
 import de.tilman_neumann.jml.factor.siqs.poly.SIQSPolyGenerator;
-import de.tilman_neumann.jml.factor.siqs.powers.PowerOfSmallPrimesFinder;
-import de.tilman_neumann.jml.factor.siqs.sieve.Sieve03g;
 import de.tilman_neumann.jml.factor.siqs.tdiv.TDivReport;
-import de.tilman_neumann.jml.factor.siqs.tdiv.TDiv_QS_1Large_UBI;
 import de.tilman_neumann.jml.factor.squfof.SquFoF31;
 import de.tilman_neumann.jml.factor.squfof.SquFoF63;
 import de.tilman_neumann.jml.primes.probable.BPSWTest;
@@ -74,7 +70,7 @@ public class TDiv_LQS_bigq implements TDiv_LQS {
 
 	private SquFoF31 squFoF31; // used for Q <= 2^52 that pass trial division
 	private SquFoF63 squFoF63; // used for 2^53 <= Q <= 2^59
-	private SIQS qsInternal; // Nested SIQS for Q_rest >= 2^60. Required only for approximately N>310 bit.
+	private SIQS_Small qsInternal; // Nested SIQS for Q_rest >= 2^60. Required only for approximately N>310 bit.
 
 	// result: two arrays that are reused, their content is _copied_ to AQ-pairs
 	private SortedIntegerArray smallFactors = new SortedIntegerArray();
@@ -90,8 +86,7 @@ public class TDiv_LQS_bigq implements TDiv_LQS {
 		this.probablePrimeTest = new BPSWTest();
 		this.squFoF31 = new SquFoF31();
 		this.squFoF63 = new SquFoF63();
-		// XXX For safety reasons we do not use Sieve03gU yet for the internal quadratic sieve
-		this.qsInternal = new SIQS(0.32F, 0.37F, null, 0.16F, new PowerOfSmallPrimesFinder(), new SIQSPolyGenerator(), new Sieve03g(), new TDiv_QS_1Large_UBI(), 10, new MatrixSolver01_Gauss());
+		this.qsInternal = new SIQS_Small(0.305F, 0.37F, null, 0.16F, new SIQSPolyGenerator(), 10, false);
 	}
 
 	/* (non-Javadoc)

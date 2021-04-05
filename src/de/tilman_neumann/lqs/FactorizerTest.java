@@ -74,13 +74,13 @@ public class FactorizerTest {
 		algorithms = new FactorAlgorithm[] {
 
 			// CFrac
-//			new CFrac(true, 5, 1.5F, 0.152F, 0.253F, new TDiv_CF02(), 10, new MatrixSolver01_Gauss(), 5),
+//			new CFrac(true, 5, 1.5F, 0.152F, 0.253F, new TDiv_CF02(), 10, new MatrixSolver_Gauss02(), 5),
 
 			// SIQS
-			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_nLarge_UBI(true), 10, new MatrixSolver02_BlockLanczos()),
+			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_nLarge_UBI(true), 10, new MatrixSolver_BlockLanczos()),
 
 			// Multi-threaded SIQS
-//			new PSIQS_U(0.32F, 0.37F, null, null, 6, new NoPowerFinder(), new MatrixSolver02_BlockLanczos()),
+//			new PSIQS_U(0.32F, 0.37F, null, null, 6, new NoPowerFinder(), new MatrixSolver_BlockLanczos()),
 
 			// Combination of best algorithms for all factor argument sizes
 //			new CombinedFactorAlgorithm(4),
@@ -91,19 +91,19 @@ public class FactorizerTest {
 
 			// Mmult ~ 0.55 looks best
 			// big special q: best so far, has 3-partial problem at "large" N
-			/* 3-partial problem at N>=210 bit */ new LQS(0.32F, 0.55F, 1, 0.145F, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_bigq(), new MatrixSolver02_BlockLanczos()),
-			///* 3-partial problem for N>=140 bit */ new LQS(0.32F, 0.55F, 2, 0.225F, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_bigq(), new MatrixSolver02_BlockLanczos()),
-			///* 3-partial problem for N>=120 bit */ new LQS(0.32F, 0.55F, 3, 0.32F, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_bigq(), new MatrixSolver02_BlockLanczos()),
-//			new LQS(0.32F, 0.55F, 1, 0.145F, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_1L_bigq(), new MatrixSolver02_BlockLanczos()),
-//			new LQS(0.32F, 0.55F, 2, 0.225F, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_1L_bigq(), new MatrixSolver02_BlockLanczos()),
-//			new LQS(0.32F, 0.55F, 3, 0.32F, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_1L_bigq(), new MatrixSolver02_BlockLanczos()),
+			/* 3-partial problem at N>=210 bit */ new LQS(0.32F, 0.55F, 1, 0.145F, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_bigq(), new MatrixSolver_BlockLanczos()),
+//			/* 3-partial problem for N>=140 bit */ new LQS(0.32F, 0.55F, 2, 0.225F, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_bigq(), new MatrixSolver_BlockLanczos()),
+//			/* 3-partial problem for N>=120 bit */ new LQS(0.32F, 0.55F, 3, 0.32F, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_bigq(), new MatrixSolver_BlockLanczos()),
+//			new LQS(0.32F, 0.55F, 1, 0.145F, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_1L_bigq(), new MatrixSolver_BlockLanczos()),
+//			new LQS(0.32F, 0.55F, 2, 0.225F, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_1L_bigq(), new MatrixSolver_BlockLanczos()),
+//			new LQS(0.32F, 0.55F, 3, 0.32F, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_1L_bigq(), new MatrixSolver_BlockLanczos()),
 			// small special q: far too many solver runs
-//			new LQS(0.32F, 0.55F, 1, 0.16F, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver02_BlockLanczos()),
-//			new LQS(0.32F, 0.55F, 2, 0.25F, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver02_BlockLanczos()),
-//			new LQS(0.32F, 0.55F, 3, 0.35F, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver02_BlockLanczos()),
-//			new LQS_smallq(0.32F, 0.55F, 1, 0.22F, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver02_BlockLanczos()),
-//			new LQS_smallq(0.32F, 0.55F, 2, 0.26F, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver02_BlockLanczos()),
-//			new LQS_smallq(0.32F, 0.55F, 3, 0.285F, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver02_BlockLanczos())
+//			new LQS(0.32F, 0.55F, 1, 0.16F, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver_BlockLanczos()),
+//			new LQS(0.32F, 0.55F, 2, 0.25F, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver_BlockLanczos()),
+//			new LQS(0.32F, 0.55F, 3, 0.35F, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver_BlockLanczos()),
+//			new LQS_smallq(0.32F, 0.55F, 1, 0.22F, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver_BlockLanczos()),
+//			new LQS_smallq(0.32F, 0.55F, 2, 0.26F, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver_BlockLanczos()),
+//			new LQS_smallq(0.32F, 0.55F, 3, 0.285F, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver_BlockLanczos())
 		};
 	}
 	
