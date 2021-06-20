@@ -49,7 +49,7 @@ public class TDiv_LQS_1L_bigq implements TDiv_LQS {
 	private BQF_xy bqf;
 	
 	/** Q is sufficiently smooth if the unfactored Q_rest is smaller than this bound depending on N */
-	private double maxQRest;
+	private double smoothBound;
 
 	// prime base
 	private int[] primes;
@@ -84,11 +84,11 @@ public class TDiv_LQS_1L_bigq implements TDiv_LQS {
 	 * @see de.tilman_neumann.lqs.TDiv_LQS#initializeForN(int, java.math.BigInteger, double, java.math.BigInteger, double, int[], int, boolean)
 	 */
 	@Override
-	public void initializeForN(int k, BigInteger N, double N_dbl, BigInteger kN, double maxQRest, int[] primesArray, int baseSize) {
+	public void initializeForN(int k, BigInteger N, double N_dbl, BigInteger kN, double smoothBound, int[] primesArray, int baseSize) {
 		this.kN = kN;
 		// the biggest unfactored rest where some Q is considered smooth enough for a congruence.
-		this.maxQRest = maxQRest;
-		if (DEBUG) LOG.debug("maxQRest = " + maxQRest + " (" + (64 - Long.numberOfLeadingZeros((long)maxQRest)) + " bits)");
+		this.smoothBound = smoothBound;
+		if (DEBUG) LOG.debug("smoothBound = " + smoothBound + " (" + (64 - Long.numberOfLeadingZeros((long)smoothBound)) + " bits)");
 		
 		// prime base
 		this.primes = primesArray;
@@ -208,7 +208,7 @@ public class TDiv_LQS_1L_bigq implements TDiv_LQS {
 		
 		// Division by all p<=pMax was not sufficient to factor Q completely.
 		// The remaining Q_rest is either a prime > pMax, or a composite > pMax^2.
-		if (Q_rest.bitLength()>31 || Q_rest.doubleValue() >= maxQRest) return null; // Q is not sufficiently smooth
+		if (Q_rest.bitLength()>31 || Q_rest.doubleValue() >= smoothBound) return null; // Q is not sufficiently smooth
 		
 		// Q is sufficiently smooth
 		if (DEBUG) LOG.debug("Sufficient smooth big factor = " + Q_rest);

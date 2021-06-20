@@ -54,7 +54,7 @@ public class TDiv_LQS_smallq implements TDiv_LQS {
 	private BQF_xy bqf;
 	
 	/** Q is sufficiently smooth if the unfactored Q_rest is smaller than this bound depending on N */
-	private double maxQRest;
+	private double smoothBound;
 
 	// prime base
 	private int[] primes;
@@ -86,18 +86,18 @@ public class TDiv_LQS_smallq implements TDiv_LQS {
 		this.probablePrimeTest = new BPSWTest();
 		this.squFoF31 = new SquFoF31();
 		this.squFoF63 = new SquFoF63();
-		this.qsInternal = new SIQS_Small(0.305F, 0.37F, null, 0.16F, new SIQSPolyGenerator(), 10, false);
+		this.qsInternal = new SIQS_Small(0.305F, 0.37F, null, new SIQSPolyGenerator(), 10, false);
 	}
 
 	public String getName() {
 		return "TDiv_smallq";
 	}
 
-	public void initializeForN(int k, BigInteger N, double N_dbl, BigInteger kN, double maxQRest, int[] primesArray, int baseSize) {
+	public void initializeForN(int k, BigInteger N, double N_dbl, BigInteger kN, double smoothBound, int[] primesArray, int baseSize) {
 		this.kN = kN;
 		// the biggest unfactored rest where some Q is considered smooth enough for a congruence.
-		this.maxQRest = maxQRest;
-		if (DEBUG) LOG.debug("maxQRest = " + maxQRest + " (" + (64 - Long.numberOfLeadingZeros((long)maxQRest)) + " bits)");
+		this.smoothBound = smoothBound;
+		if (DEBUG) LOG.debug("smoothBound = " + smoothBound + " (" + (64 - Long.numberOfLeadingZeros((long)smoothBound)) + " bits)");
 		
 		// prime base
 		this.primes = primesArray;
@@ -211,10 +211,10 @@ public class TDiv_LQS_smallq implements TDiv_LQS {
 		
 		// Division by all p<=pMax was not sufficient to factor Q completely.
 		// The remaining Q_rest is either a prime > pMax, or a composite > pMax^2.
-		if (Q_rest.doubleValue() >= maxQRest) return null; // Q is not sufficiently smooth
+		if (Q_rest.doubleValue() >= smoothBound) return null; // Q is not sufficiently smooth
 		
 		// now we consider Q as sufficiently smooth. then we want to know all prime factors, as long as we do not find one that is too big to be useful.
-		if (DEBUG) LOG.debug("test(): pMax=" + pMax + " < Q_rest=" + Q_rest + " < maxQRest=" + maxQRest + " -> resolve all factors");
+		if (DEBUG) LOG.debug("test(): pMax=" + pMax + " < Q_rest=" + Q_rest + " < smoothBound=" + smoothBound + " -> resolve all factors");
 		boolean isSmooth = factor_recurrent(Q_rest);
 		if (DEBUG) if (bigFactors.size()>2) LOG.debug("Found " + bigFactors.size() + " distinct big factors!");
 		if (!isSmooth) return null;

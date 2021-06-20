@@ -77,10 +77,10 @@ public class FactorizerTest {
 //			new CFrac(true, 5, 1.5F, 0.152F, 0.253F, new TDiv_CF02(), 10, new MatrixSolver_Gauss02(), 5),
 
 			// SIQS
-			new SIQS(0.32F, 0.37F, null, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_nLarge_UBI(true), 10, new MatrixSolver_BlockLanczos()),
+			new SIQS(0.32F, 0.37F, null, new NoPowerFinder(), new SIQSPolyGenerator(), new Sieve03gU(), new TDiv_QS_nLarge_UBI(true), 10, new MatrixSolver_BlockLanczos()),
 
 			// Multi-threaded SIQS
-//			new PSIQS_U(0.32F, 0.37F, null, null, 6, new NoPowerFinder(), new MatrixSolver_BlockLanczos()),
+//			new PSIQS_U(0.32F, 0.37F, null, 6, new NoPowerFinder(), new MatrixSolver_BlockLanczos()),
 
 			// Combination of best algorithms for all factor argument sizes
 //			new CombinedFactorAlgorithm(4),

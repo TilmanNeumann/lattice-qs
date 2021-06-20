@@ -76,8 +76,8 @@ public class LQS extends FactorAlgorithm {
 	private LatticeSieve latticeSieve;
 	private float Mmult;
 	private int minLnPSumStyle;
-	private Float maxQRestExponent0;
-	private float maxQRestExponent;
+	private Float smoothBoundExponent0;
+	private float smoothBoundExponent;
 	private int sieveArraySideLength;
 	
 	// trial division engine
@@ -95,11 +95,11 @@ public class LQS extends FactorAlgorithm {
 	private long powerTestDuration, initNDuration, initPolyDuration, ccDuration, solverDuration;
 	private int solverRunCount;
 
-	public LQS(float Cmult, float Mmult, int minLnPSumStyle, Float maxQRestExponent, int extraCongruences, SpecialqFinder specialqFinder, LatticeSieve latticeSieve, TDiv_LQS tdivEngine, MatrixSolver matrixSolver) {
+	public LQS(float Cmult, float Mmult, int minLnPSumStyle, Float smoothBoundExponent, int extraCongruences, SpecialqFinder specialqFinder, LatticeSieve latticeSieve, TDiv_LQS tdivEngine, MatrixSolver matrixSolver) {
 		this.Cmult = Cmult;
 		this.Mmult = Mmult;
 		this.minLnPSumStyle = minLnPSumStyle;
-		this.maxQRestExponent0 = maxQRestExponent;
+		this.smoothBoundExponent0 = smoothBoundExponent;
 		this.specialqFinder = specialqFinder;
 		this.latticeSieve = latticeSieve;
 		this.auxFactorizer = tdivEngine;
@@ -110,8 +110,8 @@ public class LQS extends FactorAlgorithm {
 
 	@Override
 	public String getName() {
-		String maxQRestExponentStr = "maxQRestExponent=" + String.format("%.3f", maxQRestExponent);
-		return "LQS(Cmult=" + Cmult + ", Mmult=" + Mmult + ", sieveArraySideLength=" + sieveArraySideLength + ", minLnPSumStyle = " + minLnPSumStyle + ", " + maxQRestExponentStr + ", " + specialqFinder.getName() + ", " + latticeSieve.getName() + ", " + auxFactorizer.getName() + ", " + matrixSolver.getName() + ")";
+		String smoothBoundExponentStr = "smoothBound=" + String.format("%.3f", smoothBoundExponent);
+		return "LQS(Cmult=" + Cmult + ", Mmult=" + Mmult + ", sieveArraySideLength=" + sieveArraySideLength + ", minLnPSumStyle = " + minLnPSumStyle + ", " + smoothBoundExponentStr + ", " + specialqFinder.getName() + ", " + latticeSieve.getName() + ", " + auxFactorizer.getName() + ", " + matrixSolver.getName() + ")";
 	}
 	
 	/**
@@ -198,16 +198,16 @@ public class LQS extends FactorAlgorithm {
 		}
 		
 		// compute biggest QRest admitted for a smooth relation
-		if (maxQRestExponent0 != null) {
-			maxQRestExponent = maxQRestExponent0;
+		if (smoothBoundExponent0 != null) {
+			smoothBoundExponent = smoothBoundExponent0;
 		} else {
-			maxQRestExponent = (NBits<=150) ? 0.16F : 0.16F + (NBits-150.0F)/5250;
+			smoothBoundExponent = (NBits<=150) ? 0.16F : 0.16F + (NBits-150.0F)/5250;
 		}
-		double maxQRest = Math.pow(N_dbl, maxQRestExponent);
+		double smoothBound = Math.pow(N_dbl, smoothBoundExponent);
 
 		// compute some basic parameters for N
 		int specialqSize = pMax;
-		LQSSieveParams sieveParams = new LQSSieveParams(kN, primesArray, primeBaseSize, sieveArrayArea, minLnPSumStyle, specialqSize, maxQRest, 127);
+		LQSSieveParams sieveParams = new LQSSieveParams(kN, primesArray, primeBaseSize, sieveArrayArea, minLnPSumStyle, specialqSize, smoothBound, 127);
 		// compute logP array
 		byte[] logPArray = computeLogPArray(primesArray, primeBaseSize, sieveParams.lnPMultiplier);
 		
@@ -225,7 +225,7 @@ public class LQS extends FactorAlgorithm {
 		// initialize sub-algorithms for new N
 		latticeSieve.initializeForN(k, N, kN, primesArray, tArray, primeBaseSize, sieveParams, bqf);
 		FactorTest factorTest = new FactorTest01(N);
-		auxFactorizer.initializeForN(k, N, N_dbl, kN, maxQRest, primesArray, primeBaseSize);
+		auxFactorizer.initializeForN(k, N, N_dbl, kN, smoothBound, primesArray, primeBaseSize);
 		congruenceCollector.initialize(N, factorTest);
 		matrixSolver.initialize(N, factorTest);
 		

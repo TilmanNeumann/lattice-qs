@@ -24,7 +24,7 @@ public interface TDiv_LQS {
 
 	String getName();
 
-	void initializeForN(int k, BigInteger N, double N_dbl, BigInteger kN, double maxQRest, int[] primesArray, int baseSize);
+	void initializeForN(int k, BigInteger N, double N_dbl, BigInteger kN, double smoothBound, int[] primesArray, int baseSize);
 
 	void initializeForSpecialQ(int special_q, BQF_xy bqf);
 
