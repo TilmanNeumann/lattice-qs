@@ -298,7 +298,7 @@ public class TDiv_LQS_bigq implements TDiv_LQS {
 	 */
 	@Override
 	public TDivReport getReport() {
-		return new TDivReport(testCount, sufficientSmoothCount, duration, 0, 0, 0, 0, null);
+		return new TDivReport(testCount, sufficientSmoothCount, duration, 0, 0, 0, 0);
 	}
 	
 	/* (non-Javadoc)

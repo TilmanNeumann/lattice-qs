@@ -278,7 +278,7 @@ public class TDiv_LQS_smallq implements TDiv_LQS {
 	}
 
 	public TDivReport getReport() {
-		return new TDivReport(testCount, sufficientSmoothCount, duration, 0, 0, 0, 0, null);
+		return new TDivReport(testCount, sufficientSmoothCount, duration, 0, 0, 0, 0);
 	}
 	
 	public void cleanUp() {

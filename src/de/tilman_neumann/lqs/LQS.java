@@ -310,8 +310,11 @@ public class LQS extends FactorAlgorithm {
 				LOG.info("    tDiv: " + tdivReport.getOperationDetails());
 				LOG.info("    cc: " + ccReport.getOperationDetails());
 				if (ANALYZE_LARGE_FACTOR_SIZES) {
+					LOG.info("        " + ccReport.getPartialQRestSizes());
+					LOG.info("        " + ccReport.getSmoothQRestSizes());
 					LOG.info("        " + ccReport.getPartialBigFactorSizes());
 					LOG.info("        " + ccReport.getSmoothBigFactorSizes());
+					LOG.info("        " + ccReport.getSmoothBigFactorPercentiles());
 					LOG.info("        " + ccReport.getNonIntFactorPercentages());
 				}
 				if (ANALYZE_Q_SIGNS) {
