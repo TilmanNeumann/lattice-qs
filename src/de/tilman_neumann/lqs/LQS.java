@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -30,6 +31,7 @@ import de.tilman_neumann.jml.factor.FactorException;
 import de.tilman_neumann.jml.factor.base.PrimeBaseGenerator;
 import de.tilman_neumann.jml.factor.base.congruence.AQPair;
 import de.tilman_neumann.jml.factor.base.congruence.CongruenceCollector;
+import de.tilman_neumann.jml.factor.base.congruence.CongruenceCollector01;
 import de.tilman_neumann.jml.factor.base.congruence.CongruenceCollectorReport;
 import de.tilman_neumann.jml.factor.base.congruence.Smooth;
 import de.tilman_neumann.jml.factor.base.matrixSolver.FactorTest;
@@ -104,7 +106,7 @@ public class LQS extends FactorAlgorithm {
 		this.latticeSieve = latticeSieve;
 		this.auxFactorizer = tdivEngine;
 		this.extraCongruences = extraCongruences;
-		this.congruenceCollector = new CongruenceCollector();
+		this.congruenceCollector = new CongruenceCollector01();
 		this.matrixSolver = matrixSolver;
 	}
 
@@ -265,7 +267,7 @@ public class LQS extends FactorAlgorithm {
 								solverRunCount++;
 								if (DEBUG) LOG.debug("Run " + solverRunCount + ": #smooths = " + smoothCongruenceCount + ", #requiredSmooths = " + requiredSmoothCongruenceCount);
 							}
-							ArrayList<Smooth> congruences = congruenceCollector.getSmoothCongruences();
+							Collection<Smooth> congruences = congruenceCollector.getSmoothCongruences();
 							matrixSolver.solve(congruences); // throws FactorException
 							
 							// If we get here then there was no FactorException
@@ -310,11 +312,14 @@ public class LQS extends FactorAlgorithm {
 				LOG.info("    tDiv: " + tdivReport.getOperationDetails());
 				LOG.info("    cc: " + ccReport.getOperationDetails());
 				if (ANALYZE_LARGE_FACTOR_SIZES) {
-					LOG.info("        " + ccReport.getPartialQRestSizes());
-					LOG.info("        " + ccReport.getSmoothQRestSizes());
-					LOG.info("        " + ccReport.getPartialBigFactorSizes());
-					LOG.info("        " + ccReport.getSmoothBigFactorSizes());
-					LOG.info("        " + ccReport.getSmoothBigFactorPercentiles());
+					LOG.info("        " + ccReport.getSmoothBigFactorPercentiles(1));
+					LOG.info("        " + ccReport.getSmoothBigFactorPercentiles(2));
+					LOG.info("        " + ccReport.getSmoothQRestPercentiles(1));
+					LOG.info("        " + ccReport.getSmoothQRestPercentiles(2));
+					LOG.info("        " + ccReport.getPartialBigFactorPercentiles(1));
+					LOG.info("        " + ccReport.getPartialBigFactorPercentiles(2));
+					LOG.info("        " + ccReport.getPartialQRestPercentiles(1));
+					LOG.info("        " + ccReport.getPartialQRestPercentiles(2));
 					LOG.info("        " + ccReport.getNonIntFactorPercentages());
 				}
 				if (ANALYZE_Q_SIGNS) {

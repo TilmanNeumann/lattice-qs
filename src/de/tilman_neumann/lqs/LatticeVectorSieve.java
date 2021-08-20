@@ -532,6 +532,6 @@ public class LatticeVectorSieve implements LatticeSieve {
 	
 	@Override
 	public SieveReport getReport() {
-		return new SieveReport(initDuration, sieveDuration, collectDuration);
+		return new SieveReport(0, initDuration, sieveDuration, collectDuration); // sieveHitCount is not implemented
 	}
 }
