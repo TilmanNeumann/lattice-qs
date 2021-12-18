@@ -18,7 +18,6 @@ import java.math.BigInteger;
 import org.apache.log4j.Logger;
 
 import de.tilman_neumann.jml.base.UnsignedBigInt;
-import de.tilman_neumann.jml.factor.FactorException;
 import de.tilman_neumann.jml.gcd.EEA31;
 
 import static org.junit.Assert.*;
@@ -100,9 +99,8 @@ public class BQF {
 	 * @param p
 	 * @param t modular sqrt of kN (mod p)
 	 * @return two roots, or null if the modular inverse inverse (1/A) (mod p) does not exist
-	 * @throws FactorException
 	 */
-	public int[] solvePolynomialRootsWithYEquals1(int p, int t) throws FactorException {
+	public int[] solvePolynomialRootsWithYEquals1(int p, int t) {
 		// We want to solve Ax^2 + 2Bxy + Cy^2 == 0 (mod p) with A, B, C given and y=1.
 		// <=> Ax^2 + 2Bx == -C (mod p) // * A // + B^2
 		// <=> (Ax)^2 + 2(Ax)B + B^2 == B^2 - AC (mod p)

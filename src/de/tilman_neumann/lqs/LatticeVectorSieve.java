@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 
 import de.tilman_neumann.jml.base.UnsignedBigInt;
 import de.tilman_neumann.jml.factor.FactorAlgorithm;
-import de.tilman_neumann.jml.factor.FactorException;
 import de.tilman_neumann.jml.factor.siqs.sieve.SieveReport;
 import de.tilman_neumann.jml.modular.ModularSqrt31;
 import de.tilman_neumann.util.SortedMultiset;
@@ -100,7 +99,7 @@ public class LatticeVectorSieve implements LatticeSieve {
 	}
 
 	@Override
-	public ArrayList<IntPair> sieve(int q, byte[] logPArray, byte[][] sieveArray, byte[] initializedSieveLine, byte[][] dontUseArray, int sieveArraySideLength) throws FactorException {
+	public ArrayList<IntPair> sieve(int q, byte[] logPArray, byte[][] sieveArray, byte[] initializedSieveLine, byte[][] dontUseArray, int sieveArraySideLength) {
 		if (ANALYZE) timer.capture();
 
 		// Compute modular sqrt of kN (mod q)
@@ -167,7 +166,7 @@ public class LatticeVectorSieve implements LatticeSieve {
 	 * @return list of (x,y)-pairs representing smooth candidates
 	 */
 	private ArrayList<IntPair> sieveOneQRoot(
-			int q, LatticeBase qBase, byte[] logPArray, byte[][] sieveArray, byte[] initializedSieveLine, byte[][] dontUseArray, int sieveArraySideLength) throws FactorException {
+			int q, LatticeBase qBase, byte[] logPArray, byte[][] sieveArray, byte[] initializedSieveLine, byte[][] dontUseArray, int sieveArraySideLength) {
 		
 		// compute second BQF in (e, f); here we may get coefficients a, b < 0
 		BQF Qef = computeSecondBQF(q, qBase);

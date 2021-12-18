@@ -285,13 +285,13 @@ public class LQS_smallq extends FactorAlgorithm {
 							requiredSmoothCongruenceCount += extraCongruences;
 						}
 					} // else: new partial found
-				} // end (special q)
+				}
 				if (ANALYZE) ccDuration += timer.capture();
 				if (DEBUG) {
 					LOG.debug("'special q' = " + specialQ + ": Sieve found " + smoothCandidatesFromLatticeSieve.size() + " smooth (x,y), tDiv let " + aqPairs.size() + " pass.");
 					LOG.debug("-> Now in total we have found " + congruenceCollector.getSmoothCongruenceCount() + " / " + requiredSmoothCongruenceCount + " smooth congruences and " + congruenceCollector.getPartialCongruenceCount() + " partials.");
 				}
-			}
+			} // end for (special q)
 		} catch (FactorException fe) {
 			BigInteger factor = fe.getFactor();
 			if (ANALYZE) {

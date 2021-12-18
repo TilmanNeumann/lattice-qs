@@ -16,7 +16,6 @@ package de.tilman_neumann.lqs;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-import de.tilman_neumann.jml.factor.FactorException;
 import de.tilman_neumann.jml.factor.siqs.sieve.SieveReport;
 
 /**
@@ -29,7 +28,7 @@ public interface LatticeSieve {
 	
 	void initializeForN(int k, BigInteger N, BigInteger kN, int[] primesArray, int[] tArray, int primeBaseSize, LQSSieveParams sieveParams, BQF_xy Qxy);
 	
-	ArrayList<IntPair> sieve(int q, byte[] logPArray, byte[][] sieveArray, byte[] initializedSieveLine, byte[][] dontUseArray, int sieveArraySideLength) throws FactorException;
+	ArrayList<IntPair> sieve(int q, byte[] logPArray, byte[][] sieveArray, byte[] initializedSieveLine, byte[][] dontUseArray, int sieveArraySideLength);
 
 	public SieveReport getReport();
 
