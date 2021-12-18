@@ -438,7 +438,7 @@ public class LatticeVectorSieve implements LatticeSieve {
 
 							if (TEST_FACTORS) {
 								// verify that all small factors of Q are in the prime base
-								SortedMultiset<BigInteger> QFactors = FactorAlgorithm.DEFAULT.factor(Q);
+								SortedMultiset<BigInteger> QFactors = FactorAlgorithm.getDefault().factor(Q);
 								for (BigInteger factor : QFactors.keySet()) {
 									if (factor.bitLength()> 31) break; // too big
 									int iFactor = factor.intValue();
@@ -513,7 +513,7 @@ public class LatticeVectorSieve implements LatticeSieve {
 					if (TEST_SIEVE_ARRAY) {
 						// test if the rest is smooth
 						BigInteger QRest = Q.divide(qBig);
-						SortedMultiset<BigInteger> factors = FactorAlgorithm.DEFAULT.factor(QRest);
+						SortedMultiset<BigInteger> factors = FactorAlgorithm.getDefault().factor(QRest);
 						BigInteger biggestFactor = factors.getBiggestElement();
 						if (biggestFactor.bitLength()<32 && biggestFactor.intValue()<=pMax) {
 							if (DEBUG) LOG.debug("smooth Q=" + Q + ": QRest=" + QRest + " has factors " + factors + ", biggestFactor=" + biggestFactor + ", pMax=" + pMax);
