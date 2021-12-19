@@ -21,7 +21,6 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -33,7 +32,6 @@ import de.tilman_neumann.jml.factor.base.congruence.AQPair;
 import de.tilman_neumann.jml.factor.base.congruence.CongruenceCollector;
 import de.tilman_neumann.jml.factor.base.congruence.CongruenceCollector01;
 import de.tilman_neumann.jml.factor.base.congruence.CongruenceCollectorReport;
-import de.tilman_neumann.jml.factor.base.congruence.Smooth;
 import de.tilman_neumann.jml.factor.base.matrixSolver.FactorTest;
 import de.tilman_neumann.jml.factor.base.matrixSolver.FactorTest01;
 import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver;
@@ -95,8 +93,7 @@ public class LQS_smallq extends FactorAlgorithm {
 	
 	// statistics
 	private Timer timer = new Timer();
-	private long powerTestDuration, initNDuration, initPolyDuration, ccDuration, solverDuration;
-	private int solverRunCount;
+	private long powerTestDuration, initNDuration, initPolyDuration;
 
 	public LQS_smallq(float Cmult, float Mmult, int minLnPSumStyle, Float smoothBoundExponent, int extraCongruences, SpecialqFinder specialqFinder, LatticeSieve latticeSieve, TDiv_LQS tdivEngine, MatrixSolver matrixSolver) {
 		this.Cmult = Cmult;
@@ -124,8 +121,7 @@ public class LQS_smallq extends FactorAlgorithm {
 	public BigInteger findSingleFactor(BigInteger N) {
 		if (ANALYZE) {
 			timer.start(); // start timer
-			powerTestDuration = initNDuration = initPolyDuration = ccDuration = solverDuration = 0;
-			solverRunCount = 0;
+			powerTestDuration = initNDuration = initPolyDuration = 0;
 		}
 
 		// the quadratic sieve does not work for pure powers; check that first:
@@ -227,116 +223,58 @@ public class LQS_smallq extends FactorAlgorithm {
 		
 		// initialize sub-algorithms for new N
 		latticeSieve.initializeForN(k, N, kN, primesArray, tArray, primeBaseSize, sieveParams, bqf);
-		FactorTest factorTest = new FactorTest01(N);
 		auxFactorizer.initializeForN(k, N, N_dbl, kN, smoothBound, primesArray, primeBaseSize);
-		congruenceCollector.initialize(N, factorTest);
+		FactorTest factorTest = new FactorTest01(N);
 		matrixSolver.initialize(N, factorTest);
-		
-		try {
-			specialqFinder.initializeForN(N, kN, pMax);
-			if (ANALYZE) initNDuration += timer.capture();
-			
-			// "special_q" loop
-			while (true) {
-				// Choose some "special_q" generating the lattice L of Q(x, y) divisible by q.
-				// We want q to be int, and slightly bigger than the prime base.
-				int specialQ = specialqFinder.nextSpecialQ();
-				// TODO Perform tests to find the optimal size of special q. Also consider q < pMax !
-				if (ANALYZE) initPolyDuration += timer.capture();
-			
-				auxFactorizer.initializeForSpecialQ(specialQ, bqf);
-				
-				// do the lattice sieve
-				ArrayList<IntPair> smoothCandidatesFromLatticeSieve = latticeSieve.sieve(specialQ, logPArray, sieveArray, initializedSieveLine, dontUseArray, sieveArraySideLength);
-				if (DEBUG) if (smoothCandidatesFromLatticeSieve.size() > 0) LOG.debug("q=" + specialQ + ": Lattice sieve found " + smoothCandidatesFromLatticeSieve.size() + " smooth candidates");
+		congruenceCollector.initialize(N, primeBaseSize, matrixSolver, factorTest);
 
-				// trial division stage: produce AQ-pairs
-				List<AQPair> aqPairs = this.auxFactorizer.testList(smoothCandidatesFromLatticeSieve);
-				if (DEBUG) LOG.debug("Trial division found " + aqPairs.size() + " Q(x) smooth enough for a congruence.");
-
-				// add all congruences
-				if (ANALYZE) timer.capture();
-				for (AQPair aqPair : aqPairs) {
-					boolean addedSmooth = congruenceCollector.add(aqPair);
-					if (addedSmooth) {
-						int smoothCongruenceCount = congruenceCollector.getSmoothCongruenceCount();
-						if (DEBUG) LOG.info("Found smooth congruence #" + smoothCongruenceCount);
-						if (smoothCongruenceCount >= requiredSmoothCongruenceCount) {
-							// Try to solve equation system
-							if (ANALYZE) {
-								ccDuration += timer.capture();
-								solverRunCount++;
-								if (DEBUG) LOG.debug("Run " + solverRunCount + ": #smooths = " + smoothCongruenceCount + ", #requiredSmooths = " + requiredSmoothCongruenceCount);
-							}
-							Collection<Smooth> congruences = congruenceCollector.getSmoothCongruences();
-							matrixSolver.solve(congruences); // throws FactorException
-							
-							// If we get here then there was no FactorException
-							if (DEBUG) {
-								// Log all congruences
-								LOG.debug("Failed solver run with " + smoothCongruenceCount + " congruences:");
-								for (Smooth smooth : congruences) {
-									LOG.debug("    " + smooth.toString());
-								}
-							}
-							
-							if (ANALYZE) solverDuration += timer.capture();
-							// Extend equation system and continue searching smooth congruences
-							requiredSmoothCongruenceCount += extraCongruences;
-						}
-					} // else: new partial found
-				}
-				if (ANALYZE) ccDuration += timer.capture();
-				if (DEBUG) {
-					LOG.debug("'special q' = " + specialQ + ": Sieve found " + smoothCandidatesFromLatticeSieve.size() + " smooth (x,y), tDiv let " + aqPairs.size() + " pass.");
-					LOG.debug("-> Now in total we have found " + congruenceCollector.getSmoothCongruenceCount() + " / " + requiredSmoothCongruenceCount + " smooth congruences and " + congruenceCollector.getPartialCongruenceCount() + " partials.");
-				}
-			} // end for (special q)
-		} catch (FactorException fe) {
-			BigInteger factor = fe.getFactor();
-			if (ANALYZE) {
-				solverDuration += timer.capture();
-				// get all reports
-				SieveReport sieveReport = latticeSieve.getReport();
-				TDivReport tdivReport = auxFactorizer.getReport();
-				CongruenceCollectorReport ccReport = congruenceCollector.getReport();
-				// solverReport is not urgently needed
-				
-				long sieveDuration = sieveReport.getTotalDuration(1);
-				long tdivDuration = tdivReport.getTotalDuration(1);
-				
-				// report results
-				LOG.info(getName() + ":");
-				LOG.info("Found factor " + factor + " (" + factor.bitLength() + " bits) of N=" + N + " (" + NBits + " bits) in " + TimeUtil.timeStr(timer.totalRuntime()));
-				int pMaxBits = 32 - Integer.numberOfLeadingZeros(pMax);
-				LOG.info("    multiplier k = " + k + ", kN%8 = " + kN.mod(I_8) + ", primeBaseSize = " + primeBaseSize + ", pMax = " + pMax + " (" + pMaxBits + " bits), sieveArrayArea = " + sieveArrayArea);
-				LOG.info("    tDiv: " + tdivReport.getOperationDetails());
-				LOG.info("    cc: " + ccReport.getOperationDetails());
-				if (ANALYZE_LARGE_FACTOR_SIZES) {
-					LOG.info("        " + ccReport.getSmoothBigFactorPercentiles(1));
-					LOG.info("        " + ccReport.getSmoothBigFactorPercentiles(2));
-					LOG.info("        " + ccReport.getSmoothQRestPercentiles(1));
-					LOG.info("        " + ccReport.getSmoothQRestPercentiles(2));
-					LOG.info("        " + ccReport.getPartialBigFactorPercentiles(1));
-					LOG.info("        " + ccReport.getPartialBigFactorPercentiles(2));
-					LOG.info("        " + ccReport.getPartialQRestPercentiles(1));
-					LOG.info("        " + ccReport.getPartialQRestPercentiles(2));
-					LOG.info("        " + ccReport.getNonIntFactorPercentages());
-				}
-				if (ANALYZE_Q_SIGNS) {
-					LOG.info("        " + ccReport.getPartialQSignCounts());
-					LOG.info("        " + ccReport.getSmoothQSignCounts());
-				}
-				LOG.info("    #solverRuns = " + solverRunCount + ", #tested null vectors = " + matrixSolver.getTestedNullVectorCount());
-				LOG.info("    Approximate phase timings: powerTest=" + powerTestDuration + "ms, initN=" + initNDuration + "ms, initPoly=" + initPolyDuration + "ms, sieve=" + sieveDuration + "ms, tdiv=" + tdivDuration + "ms, cc=" + ccDuration + "ms, solver=" + solverDuration + "ms");
-				LOG.info("    -> sieve sub-timings: " + sieveReport.getPhaseTimings(1));
-				// TODO: TDiv, CC and solver have no sub-timings yet
-			}
-			// TODO clean up
+		specialqFinder.initializeForN(N, kN, pMax);
+		if (ANALYZE) initNDuration += timer.capture();
 			
-			// return factor
-			return factor;
+		// "special_q" loop
+		BigInteger factor = null;
+		while (factor == null) {
+			factor = testSpecialQ(bqf, logPArray, sieveArray, initializedSieveLine, dontUseArray);
 		}
+
+		if (ANALYZE) {
+			// get all reports
+			SieveReport sieveReport = latticeSieve.getReport();
+			TDivReport tdivReport = auxFactorizer.getReport();
+			CongruenceCollectorReport ccReport = congruenceCollector.getReport();
+			// solverReport is not urgently needed
+			
+			long sieveDuration = sieveReport.getTotalDuration(1);
+			long tdivDuration = tdivReport.getTotalDuration(1);
+			
+			// report results
+			LOG.info(getName() + ":");
+			LOG.info("Found factor " + factor + " (" + factor.bitLength() + " bits) of N=" + N + " (" + NBits + " bits) in " + TimeUtil.timeStr(timer.totalRuntime()));
+			int pMaxBits = 32 - Integer.numberOfLeadingZeros(pMax);
+			LOG.info("    multiplier k = " + k + ", kN%8 = " + kN.mod(I_8) + ", primeBaseSize = " + primeBaseSize + ", pMax = " + pMax + " (" + pMaxBits + " bits), sieveArrayArea = " + sieveArrayArea);
+			LOG.info("    tDiv: " + tdivReport.getOperationDetails());
+			LOG.info("    cc: " + ccReport.getOperationDetails());
+			if (ANALYZE_LARGE_FACTOR_SIZES) {
+				for (int i=1; i<=2; i++) LOG.info("        " + ccReport.getSmoothBigFactorPercentiles(i));
+				for (int i=1; i<=2; i++) LOG.info("        " + ccReport.getSmoothQRestPercentiles(i));
+				for (int i=1; i<=2; i++) LOG.info("        " + ccReport.getPartialBigFactorPercentiles(i));
+				for (int i=1; i<=2; i++) LOG.info("        " + ccReport.getPartialQRestPercentiles(i));
+				LOG.info("        " + ccReport.getNonIntFactorPercentages());
+			}
+			if (ANALYZE_Q_SIGNS) {
+				LOG.info("        " + ccReport.getPartialQSignCounts());
+				LOG.info("        " + ccReport.getSmoothQSignCounts());
+			}
+			LOG.info("    #solverRuns = " + congruenceCollector.getSolverRunCount() + ", #tested null vectors = " + congruenceCollector.getTestedNullVectorCount());
+			LOG.info("    Approximate phase timings: powerTest=" + powerTestDuration + "ms, initN=" + initNDuration + "ms, initPoly=" + initPolyDuration + "ms, sieve=" + sieveDuration + "ms, tdiv=" + tdivDuration + "ms, cc=" + congruenceCollector.getCollectDuration() + "ms, solver=" + congruenceCollector.getSolverDuration() + "ms");
+			LOG.info("    -> sieve sub-timings: " + sieveReport.getPhaseTimings(1));
+			
+			// TDiv, CC and solver have no sub-timings yet
+		}
+		// TODO clean up
+		
+		// return factor
+		return factor;
 	}
 	
 	private byte[] computeLogPArray(int[] primesArray, int primeBaseSize, float lnPMultiplier) {
@@ -380,6 +318,34 @@ public class LQS_smallq extends FactorAlgorithm {
 			}
 		}
 		return dontUseArray;
+	}
+	
+	private BigInteger testSpecialQ(BQF_xy bqf, byte[] logPArray, byte[][] sieveArray, byte[] initializedSieveLine, byte[][] dontUseArray) {
+		if (ANALYZE) timer.capture();
+		// Choose some "special_q" generating the lattice L of Q(x, y) divisible by q.
+		// We want q to be int, and slightly bigger than the prime base.
+		int specialQ;
+		try {
+			specialQ = specialqFinder.nextSpecialQ();
+		} catch (FactorException fe) {
+			return fe.getFactor();
+		}
+		// TODO Perform tests to find the optimal size of special q. Also consider q < pMax !
+	
+		auxFactorizer.initializeForSpecialQ(specialQ, bqf);
+		if (ANALYZE) initPolyDuration += timer.capture();
+
+		// do the lattice sieve
+		ArrayList<IntPair> smoothCandidatesFromLatticeSieve = latticeSieve.sieve(specialQ, logPArray, sieveArray, initializedSieveLine, dontUseArray, sieveArraySideLength);
+		if (DEBUG) if (smoothCandidatesFromLatticeSieve.size() > 0) LOG.debug("q=" + specialQ + ": Lattice sieve found " + smoothCandidatesFromLatticeSieve.size() + " smooth candidates");
+
+		// trial division stage: produce AQ-pairs
+		List<AQPair> aqPairs = this.auxFactorizer.testList(smoothCandidatesFromLatticeSieve);
+		if (DEBUG) LOG.debug("Trial division found " + aqPairs.size() + " Q(x) smooth enough for a congruence.");
+
+		// add all congruences and run matrix solver if appropriate
+		congruenceCollector.collectAndProcessAQPairs(aqPairs);
+		return congruenceCollector.getFactor();
 	}
 	
 	// Standalone test --------------------------------------------------------------------------------------------------
