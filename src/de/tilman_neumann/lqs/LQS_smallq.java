@@ -23,7 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.tilman_neumann.jml.factor.FactorAlgorithm;
 import de.tilman_neumann.jml.factor.FactorException;
@@ -55,7 +56,7 @@ import de.tilman_neumann.util.Timer;
  */
 // TODO fix too many solver runs issue with small special q
 public class LQS_smallq extends FactorAlgorithm {
-	private static final Logger LOG = Logger.getLogger(LQS_smallq.class);
+	private static final Logger LOG = LogManager.getLogger(LQS_smallq.class);
 	private static final boolean DEBUG = false;
 
 	private PurePowerTest powerTest = new PurePowerTest();

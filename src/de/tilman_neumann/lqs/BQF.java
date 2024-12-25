@@ -15,7 +15,8 @@ package de.tilman_neumann.lqs;
 
 import java.math.BigInteger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.tilman_neumann.jml.base.UnsignedBigInt;
 import de.tilman_neumann.jml.gcd.EEA31;
@@ -28,7 +29,7 @@ import static org.junit.Assert.*;
  * @author Tilman Neumann
  */
 public class BQF {
-	private static final Logger LOG = Logger.getLogger(BQF.class);
+	private static final Logger LOG = LogManager.getLogger(BQF.class);
 	private static final boolean DEBUG = false;
 	
 	private EEA31 eea31 = new EEA31();

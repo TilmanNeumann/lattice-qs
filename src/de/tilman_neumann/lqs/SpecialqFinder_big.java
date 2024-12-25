@@ -15,7 +15,8 @@ package de.tilman_neumann.lqs;
 
 import java.math.BigInteger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.tilman_neumann.jml.factor.FactorException;
 import de.tilman_neumann.jml.modular.JacobiSymbol;
@@ -27,7 +28,7 @@ import de.tilman_neumann.jml.primes.exact.AutoExpandingPrimesArray;
  * @author Tilman Neumann
  */
 public class SpecialqFinder_big implements SpecialqFinder {
-	private static final Logger LOG = Logger.getLogger(SpecialqFinder_big.class);
+	private static final Logger LOG = LogManager.getLogger(SpecialqFinder_big.class);
 	private static final boolean DEBUG = false;
 
 	private BigInteger N, kN;

@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.tilman_neumann.jml.factor.CombinedFactorAlgorithm;
 import de.tilman_neumann.jml.factor.FactorAlgorithm;
@@ -51,7 +52,7 @@ import de.tilman_neumann.util.TimeUtil;
  */
 @SuppressWarnings("unused") // suppress warnings on unused imports
 public class FactorizerTest {
-	private static final Logger LOG = Logger.getLogger(FactorizerTest.class);
+	private static final Logger LOG = LogManager.getLogger(FactorizerTest.class);
 
 	// algorithm options
 	/** number of test numbers */

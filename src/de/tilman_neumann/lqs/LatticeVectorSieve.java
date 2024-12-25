@@ -22,7 +22,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.tilman_neumann.jml.base.UnsignedBigInt;
 import de.tilman_neumann.jml.factor.FactorAlgorithm;
@@ -44,7 +45,7 @@ import de.tilman_neumann.util.Timer;
 // TODO implement line sieve
 // TODO For large numbers, we might need to convert (int*int) multiplications to (int*long) multiplications. At 210 bit, this had no impact yet, though...
 public class LatticeVectorSieve implements LatticeSieve {
-	private static final Logger LOG = Logger.getLogger(LatticeVectorSieve.class);
+	private static final Logger LOG = LogManager.getLogger(LatticeVectorSieve.class);
 	private static final boolean DEBUG = false;
 	private static final boolean TEST_FACTORS = false;
 	private static final boolean TEST_SIEVE_ARRAY = false;

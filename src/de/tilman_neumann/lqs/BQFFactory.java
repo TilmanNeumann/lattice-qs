@@ -16,7 +16,8 @@ package de.tilman_neumann.lqs;
 import java.math.BigInteger;
 import java.util.HashSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.tilman_neumann.jml.factor.FactorException;
 import de.tilman_neumann.jml.modular.JacobiSymbol;
@@ -34,7 +35,7 @@ import static org.junit.Assert.*;
  * @author Tilman Neumann
  */
 public class BQFFactory {
-	private static final Logger LOG = Logger.getLogger(BQFFactory.class);
+	private static final Logger LOG = LogManager.getLogger(BQFFactory.class);
 	private static final boolean DEBUG = false;
 
 	/**

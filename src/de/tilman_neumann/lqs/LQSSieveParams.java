@@ -15,14 +15,15 @@ package de.tilman_neumann.lqs;
 
 import java.math.BigInteger;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Basic parameters for the quadratic sieve.
  * @author Tilman Neumann
  */
 public class LQSSieveParams {
-	private static final Logger LOG = Logger.getLogger(LQSSieveParams.class);
+	private static final Logger LOG = LogManager.getLogger(LQSSieveParams.class);
 	private static final boolean DEBUG = false;
 
 	/** the index of the smallest prime used for sieving. */
