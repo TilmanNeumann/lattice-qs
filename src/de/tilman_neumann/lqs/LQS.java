@@ -36,7 +36,7 @@ import de.tilman_neumann.jml.factor.base.congruence.CongruenceCollectorReport;
 import de.tilman_neumann.jml.factor.base.matrixSolver.FactorTest;
 import de.tilman_neumann.jml.factor.base.matrixSolver.FactorTest01;
 import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver;
-import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver_BlockLanczos;
+import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolverBlockLanczos;
 import de.tilman_neumann.jml.factor.siqs.KnuthSchroeppel;
 import de.tilman_neumann.jml.factor.siqs.ModularSqrtsEngine;
 import de.tilman_neumann.jml.factor.siqs.sieve.SieveReport;
@@ -385,7 +385,7 @@ public class LQS extends FactorAlgorithm {
 	 * 1114170342238328228419686817856626026481517749572426317489981 (running 50 minutes instead of expected 8-12)
 	 */
 	private static void testInput() {
-		LQS qs = new LQS(0.32F, 0.55F, 1, null, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_bigq(), new MatrixSolver_BlockLanczos());
+		LQS qs = new LQS(0.32F, 0.55F, 1, null, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_bigq(), new MatrixSolverBlockLanczos());
 		//LQS qs = new LQS(0.32F, 0.55F, 1, null, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver02_BlockLanczos(), true);
 
 		Timer timer = new Timer();

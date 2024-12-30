@@ -36,7 +36,7 @@ import de.tilman_neumann.jml.factor.base.congruence.CongruenceCollectorReport;
 import de.tilman_neumann.jml.factor.base.matrixSolver.FactorTest;
 import de.tilman_neumann.jml.factor.base.matrixSolver.FactorTest01;
 import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver;
-import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolver_BlockLanczos;
+import de.tilman_neumann.jml.factor.base.matrixSolver.MatrixSolverBlockLanczos;
 import de.tilman_neumann.jml.factor.siqs.KnuthSchroeppel;
 import de.tilman_neumann.jml.factor.siqs.ModularSqrtsEngine;
 import de.tilman_neumann.jml.factor.siqs.sieve.SieveReport;
@@ -385,7 +385,7 @@ public class LQS_smallq extends FactorAlgorithm {
 	 */
 	private static void testInput() {
 		//LQS_smallq qs = new LQS_smallq(0.32F, 0.55F, 1, null, 10, new SpecialqFinder_big(), new LatticeVectorSieve(), new TDiv_LQS_bigq(), new MatrixSolver02_BlockLanczos(), true);
-		LQS_smallq qs = new LQS_smallq(0.32F, 0.55F, 1, null, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolver_BlockLanczos());
+		LQS_smallq qs = new LQS_smallq(0.32F, 0.55F, 1, null, 10, new SpecialqFinder_small(), new LatticeVectorSieve(), new TDiv_LQS_smallq(), new MatrixSolverBlockLanczos());
 
 		Timer timer = new Timer();
 		while(true) {
