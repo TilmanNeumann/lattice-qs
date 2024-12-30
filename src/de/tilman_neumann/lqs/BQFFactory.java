@@ -21,7 +21,7 @@ import org.apache.logging.log4j.LogManager;
 
 import de.tilman_neumann.jml.factor.FactorException;
 import de.tilman_neumann.jml.modular.JacobiSymbol;
-import de.tilman_neumann.jml.modular.ModularSqrt_BB;
+import de.tilman_neumann.jml.modular.ModularSqrtBig;
 import de.tilman_neumann.jml.primes.probable.BPSWTest;
 import de.tilman_neumann.jml.roots.Roots;
 
@@ -47,7 +47,7 @@ public class BQFFactory {
 
 	private BPSWTest bpsw = new BPSWTest();
 	private JacobiSymbol jacobiEngine = new JacobiSymbol();
-	private ModularSqrt_BB modEngine = new ModularSqrt_BB();
+	private ModularSqrtBig modEngine = new ModularSqrtBig();
 
 	/**
 	 * Construct a binary quadratic form Q(x, y) = A*x^2 + 2Bxy + C*y2 with discriminant D = 4(B^2-AC) = 4kN.
